@@ -4,6 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sudarshan V — Hardware Engineer</title>
+<meta name="description" content="Portfolio of Sudarshan V — Electronics and Communication Engineering student specializing in ASIC design, RF and antenna engineering, and embedded systems.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2314171A'/%3E%3Ctext x='50' y='68' font-size='58' font-family='monospace' font-weight='700' fill='%23A6620A' text-anchor='middle'%3ESV%3C/text%3E%3C/svg%3E">
+<meta property="og:title" content="Sudarshan V — Hardware Engineer">
+<meta property="og:description" content="ASIC design, RF/antenna engineering, and embedded systems — a taped-out SKY130 chip, THz metamaterial sensing, and more.">
+<meta property="og:image" content="https://sudarshan-veera.github.io/images/profile.jpg">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://sudarshan-veera.github.io">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Sudarshan V — Hardware Engineer">
+<meta name="twitter:description" content="ASIC design, RF/antenna engineering, and embedded systems.">
+<meta name="twitter:image" content="https://sudarshan-veera.github.io/images/profile.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -195,7 +206,6 @@
     width:100%;
     height:140px;
     object-fit:cover;
-    filter:grayscale(1) contrast(1.05);
     display:block;
   }
   .chip .cap{
@@ -368,6 +378,42 @@
   .contact-grid .k{color:#8A8F97; display:block; font-size:11.5px; margin-bottom:4px;}
   .contact-grid a{color:var(--paper); text-decoration:none; border-bottom:1px solid #4A4F55;}
   .contact-grid a:hover{border-color:var(--paper);}
+
+  .contact-form{
+    margin-top:28px;
+    max-width:480px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .form-row{display:flex; gap:12px;}
+  .contact-form input, .contact-form textarea{
+    background:#1C2024;
+    border:1px solid #33373D;
+    color:var(--paper);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14px;
+    padding:10px 12px;
+    width:100%;
+    resize:vertical;
+  }
+  .contact-form input:focus, .contact-form textarea:focus{
+    outline:none;
+    border-color:var(--copper);
+  }
+  .form-submit{
+    align-self:flex-start;
+    background:var(--copper);
+    color:#14171A;
+    border:none;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    font-weight:600;
+    padding:10px 20px;
+    cursor:pointer;
+  }
+  .form-submit:hover{background:#c07a2e;}
+  @media (max-width:500px){.form-row{flex-direction:column;}}
   footer .bottom-line{
     margin-top:40px; padding-top:18px; border-top:1px solid #33373D; font-family:'IBM Plex Mono', monospace;
     font-size:11.5px; color:#7A7F86; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
@@ -438,6 +484,7 @@
       <a href="tel:+919025876308">+91 90258 76308</a>
       <a href="https://linkedin.com/in/sudarshan-veera8" target="_blank" rel="noopener">linkedin.com/in/sudarshan-veera8</a>
       <a href="https://github.com/Sudarshan-veera" target="_blank" rel="noopener">github.com/Sudarshan-veera</a>
+      <a class="copy-btn" href="resume.pdf" download style="text-decoration:none;">Download Resume</a>
     </div>
 
     <div class="pinout">
@@ -450,7 +497,8 @@
         </div>
         <div class="chip">
           <div class="pin1"></div>
-          <img src="https://avatars.githubusercontent.com/u/203442762?v=4" alt="Sudarshan V" loading="lazy">
+          <img src="images/profile.jpg" alt="Sudarshan V" loading="lazy"
+               onerror="this.src='https://avatars.githubusercontent.com/u/203442762?v=4'">
           <div class="cap">
             <div class="id">SV-CORE</div>
             <div class="role">Hardware &amp;<br>Embedded Systems</div>
@@ -535,11 +583,6 @@
     <div class="block-head"><span class="desig">§04</span><h2>Academic Projects</h2></div>
 
     <div class="datasheet-card">
-      <div class="ds-visual">
-        <img src="https://opengraph.githubassets.com/1/Sudarshan-veera/Sudarshan-veera" alt="Sudarshan V GitHub profile preview" loading="lazy"
-             onerror="this.parentElement.style.display='none'">
-        <span class="ds-tag">CST Studio Suite — RF / THz simulation</span>
-      </div>
       <div class="ds-head">
         <span class="title">THz Metamaterial Sensor for Refractive Index Analysis</span>
         <span class="year">2025</span>
@@ -566,11 +609,6 @@
     </div>
 
     <div class="datasheet-card">
-      <div class="ds-visual">
-        <img src="https://opengraph.githubassets.com/1/Sudarshan-veera/TT_proj" alt="TT_proj repository preview" loading="lazy"
-             onerror="this.parentElement.style.display='none'">
-        <span class="ds-tag">github.com/Sudarshan-veera/TT_proj</span>
-      </div>
       <div class="ds-head">
         <span class="title">TinyTapeout — Hardware Adaptive Anomaly Detector</span>
         <span class="year">2026</span>
@@ -598,11 +636,6 @@
     </div>
 
     <div class="datasheet-card">
-      <div class="ds-visual">
-        <img src="https://opengraph.githubassets.com/1/Sudarshan-veera/LoRA-WAN_CampusChat" alt="LoRA-WAN_CampusChat repository preview" loading="lazy"
-             onerror="this.parentElement.style.display='none'">
-        <span class="ds-tag">github.com/Sudarshan-veera/LoRA-WAN_CampusChat</span>
-      </div>
       <div class="ds-head">
         <span class="title">LoRa-Based Campus Chat System Using Token Passing</span>
         <span class="year">2026</span>
@@ -628,11 +661,6 @@
     </div>
 
     <div class="datasheet-card">
-      <div class="ds-visual">
-        <img src="https://opengraph.githubassets.com/1/Sudarshan-veera/Angel-bot" alt="Angel-bot repository preview" loading="lazy"
-             onerror="this.parentElement.style.display='none'">
-        <span class="ds-tag">github.com/Sudarshan-veera/Angel-bot</span>
-      </div>
       <div class="ds-head">
         <span class="title">ANGEL BOT — IoT-Based Disaster Rescue Robot</span>
         <span class="year">2025</span>
@@ -654,6 +682,17 @@
           </div>
         </div>
         <a class="ds-link" href="https://github.com/Sudarshan-veera/Angel-bot" target="_blank" rel="noopener">→ View repository</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOTES -->
+  <section class="block reveal" id="notes">
+    <div class="block-head"><span class="desig">§04.1</span><h2>Notes</h2></div>
+    <div class="exp-item" style="grid-template-columns:1fr;">
+      <div>
+        <h3>Taping out a SKY130 ASIC as a student</h3>
+        <p style="color:var(--ink-soft); max-width:680px;">The TinyTapeout submission meant working within real silicon constraints rather than simulation-only limits — an 80% tile utilization ceiling, a strict power budget, and gate-level checks that don't forgive shortcuts. The most instructive part was debugging forbidden met5 PDN violations and cocotb X-value errors: each fix required tracing the issue back through the physical design flow in OpenROAD rather than just the RTL. It reframed hardware design as a negotiation with the fabrication process, not just the logic.</p>
       </div>
     </div>
   </section>
@@ -686,6 +725,15 @@
     <span class="desig">§07</span>
     <h2>Contact</h2>
     <p style="max-width:520px; color:#B6BAC0;">Open to Hardware Engineering internship opportunities and collaborations in ASIC design and verification, RF and antenna engineering, and embedded systems.</p>
+
+    <form class="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+      <div class="form-row">
+        <input type="text" name="name" placeholder="Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+      </div>
+      <textarea name="message" rows="4" placeholder="Message" required></textarea>
+      <button type="submit" class="form-submit">Send Message</button>
+    </form>
     <div class="contact-grid">
       <div><span class="k">EMAIL</span><a href="mailto:sudarshan060617@gmail.com">sudarshan060617@gmail.com</a></div>
       <div><span class="k">PHONE</span><a href="tel:+919025876308">+91 90258 76308</a></div>
