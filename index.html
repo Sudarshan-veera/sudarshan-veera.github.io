@@ -186,6 +186,28 @@
   .copy-btn:hover{border-color:var(--ink-soft); color:var(--ink);}
   .copy-btn.copied{color:var(--good); border-color:var(--good);}
 
+  /* waveform strip */
+  .waveform{
+    margin-top:36px;
+    width:100%;
+    max-width:520px;
+    height:32px;
+    color:var(--copper);
+    opacity:0.55;
+    overflow:hidden;
+  }
+  .waveform svg{width:200%; height:100%; display:block;}
+  .wave-line{
+    stroke-dasharray:1600;
+    stroke-dashoffset:0;
+    animation: waveScroll 6s linear infinite;
+  }
+  @keyframes waveScroll{
+    0%{transform:translateX(0);}
+    100%{transform:translateX(-50%);}
+  }
+  @media (prefers-reduced-motion: reduce){.wave-line{animation:none;}}
+
   /* pinout diagram */
   .pinout{
     margin-top:52px;
@@ -202,6 +224,22 @@
     font-family:'IBM Plex Mono', monospace;
     overflow:hidden;
   }
+  .chip::after{
+    content:'';
+    position:absolute;
+    top:0; left:-40%;
+    width:30%; height:100%;
+    background:linear-gradient(90deg, transparent, rgba(230,180,110,0.14), transparent);
+    animation: scanSweep 4.5s ease-in-out infinite;
+    pointer-events:none;
+    z-index:3;
+  }
+  @keyframes scanSweep{
+    0%{left:-40%;}
+    50%{left:110%;}
+    100%{left:110%;}
+  }
+  @media (prefers-reduced-motion: reduce){.chip::after{animation:none; display:none;}}
   .chip img{
     width:100%;
     height:260px;
@@ -219,7 +257,13 @@
     border-radius:50%;
     background:var(--copper);
     z-index:2;
+    animation: ledBlink 2.2s ease-in-out infinite;
   }
+  @keyframes ledBlink{
+    0%,100%{opacity:1; box-shadow:0 0 6px 1px var(--copper);}
+    50%{opacity:0.35; box-shadow:0 0 0 0 transparent;}
+  }
+  @media (prefers-reduced-motion: reduce){.chip .pin1{animation:none;}}
   .chip .id{font-size:13px; letter-spacing:0.06em; opacity:0.75;}
   .chip .role{font-size:15px; margin-top:6px; font-weight:600;}
   .pins-wrap{
@@ -486,6 +530,13 @@
       <a href="https://linkedin.com/in/sudarshan-veera8" target="_blank" rel="noopener">linkedin.com/in/sudarshan-veera8</a>
       <a href="https://github.com/Sudarshan-veera" target="_blank" rel="noopener">github.com/Sudarshan-veera</a>
       <a class="copy-btn" href="resume.pdf" download style="text-decoration:none;">Download Resume</a>
+    </div>
+
+    <div class="waveform" aria-hidden="true">
+      <svg viewBox="0 0 600 40" preserveAspectRatio="none">
+        <polyline class="wave-line" fill="none" stroke="currentColor" stroke-width="1.5"
+          points="0,20 30,20 40,4 55,36 70,20 100,20 115,10 130,30 145,20 200,20 215,4 230,36 245,20 300,20 315,10 330,30 345,20 400,20 415,4 430,36 445,20 500,20 515,10 530,30 545,20 600,20"/>
+      </svg>
     </div>
 
     <div class="pinout">
