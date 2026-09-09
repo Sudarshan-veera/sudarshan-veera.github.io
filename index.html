@@ -313,7 +313,30 @@
     height:1px;
     width:34px;
     background:var(--line-strong);
+    position:relative;
+    overflow:hidden;
   }
+  .pin-line::after{
+    content:'';
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:linear-gradient(90deg, transparent, var(--copper), transparent);
+    opacity:0.85;
+  }
+  .pin-col:first-child .pin-line::after{ animation: dataFlowIn 2.5s ease-in-out infinite; transform:translateX(-100%); }
+  .pin-col:last-child .pin-line::after{ animation: dataFlowOut 2.5s ease-in-out infinite; transform:translateX(100%); }
+  .pin-col:first-child .pin:nth-child(1) .pin-line::after{animation-delay:0.2s;}
+  .pin-col:first-child .pin:nth-child(2) .pin-line::after{animation-delay:1.5s;}
+  .pin-col:first-child .pin:nth-child(3) .pin-line::after{animation-delay:0.8s;}
+  .pin-col:first-child .pin:nth-child(4) .pin-line::after{animation-delay:2.1s;}
+  .pin-col:last-child .pin:nth-child(1) .pin-line::after{animation-delay:0.5s;}
+  .pin-col:last-child .pin:nth-child(2) .pin-line::after{animation-delay:1.1s;}
+  .pin-col:last-child .pin:nth-child(3) .pin-line::after{animation-delay:1.9s;}
+  .pin-col:last-child .pin:nth-child(4) .pin-line::after{animation-delay:0.3s;}
+  @keyframes dataFlowIn{ 0%{transform:translateX(-100%);} 40%,100%{transform:translateX(100%);} }
+  @keyframes dataFlowOut{ 0%{transform:translateX(100%);} 40%,100%{transform:translateX(-100%);} }
+  @media (prefers-reduced-motion: reduce){.pin-line::after{animation:none; display:none;}}
   .pin-label-left{order:1; text-align:right; width:110px; padding-right:6px;}
   .pin-label-right{text-align:left; width:110px; padding-left:6px;}
   @media (max-width:720px){.pinout{display:none;}}
@@ -499,6 +522,48 @@
     font-size:11.5px; color:#7A7F86; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
   }
 
+  /* rf animation */
+  .rf-icon{
+    display:inline-block;
+    position:relative;
+    width:20px; height:20px;
+    margin-left:8px;
+    vertical-align:middle;
+    transform:translateY(-2px);
+  }
+  .rf-icon .dot{
+    position:absolute; bottom:2px; left:2px;
+    width:4px; height:4px; border-radius:50%;
+    background:var(--copper);
+  }
+  .rf-icon .wave{
+    position:absolute; bottom:3px; left:3px;
+    border-top:2px solid var(--copper);
+    border-right:2px solid var(--copper);
+    border-radius:0 100% 0 0;
+    opacity:0;
+  }
+  .rf-icon .wave1{ width:10px; height:10px; animation:rfPropagate 2s cubic-bezier(0.1,0.8,0.3,1) infinite; }
+  .rf-icon .wave2{ width:16px; height:16px; animation:rfPropagate 2s cubic-bezier(0.1,0.8,0.3,1) infinite 0.4s; }
+  @keyframes rfPropagate{
+    0%{ opacity:0; transform:scale(0.5); }
+    20%{ opacity:1; }
+    80%{ opacity:0; transform:scale(1.1); }
+    100%{ opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce){.rf-icon .wave{animation:none; opacity:1;}}
+
+  /* glitch/decode effect on hover */
+  .decode-text{ position:relative; display:inline-block; cursor:default; }
+  .decode-text:hover{ animation: decodeFlicker 0.4s steps(2, end) forwards; color:var(--copper); }
+  @keyframes decodeFlicker{
+    0%{ opacity:0.8; transform:skewX(-10deg); filter:drop-shadow(2px 0 0 rgba(224,164,92,0.5)); }
+    25%{ opacity:0.4; transform:skewX(10deg); filter:drop-shadow(-2px 0 0 rgba(110,155,224,0.5)); }
+    50%{ opacity:1; transform:skewX(-5deg); }
+    75%{ opacity:0.6; transform:skewX(5deg); }
+    100%{ opacity:1; transform:none; filter:none; }
+  }
+
   /* scroll-to-top */
   .totop{
     position:fixed; bottom:22px; right:22px;
@@ -541,7 +606,7 @@
 <div class="sheet">
 
   <header class="frame">
-    <span class="brand">SUDARSHAN V</span>
+    <span class="brand decode-text">SUDARSHAN V</span>
     <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
     <nav id="nav">
       <a href="#skills" data-nav>Skills</a>
@@ -723,7 +788,7 @@
 
     <div class="datasheet-card">
       <div class="ds-head">
-        <span class="title">LoRa-Based Campus Chat System Using Token Passing</span>
+        <span class="title">LoRa-Based Campus Chat System Using Token Passing<span class="rf-icon" style="transform:translateY(2px) scale(0.85);"><i class="dot"></i><i class="wave wave1"></i><i class="wave wave2"></i></span></span>
         <span class="year">2026</span>
       </div>
       <div class="ds-body">
@@ -809,7 +874,7 @@
   <!-- CONTACT -->
   <footer class="frame" id="contact">
     <span class="desig">§07</span>
-    <h2>Contact</h2>
+    <h2>Contact<span class="rf-icon" aria-hidden="true"><i class="dot"></i><i class="wave wave1"></i><i class="wave wave2"></i></span></h2>
     <p style="max-width:520px; color:#B6BAC0;">Open to Hardware Engineering internship opportunities and collaborations in ASIC design and verification, RF and antenna engineering, and embedded systems.</p>
 
     <form class="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
