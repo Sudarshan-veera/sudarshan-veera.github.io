@@ -230,7 +230,7 @@
   }
   @media (prefers-reduced-motion: reduce){.wave-line{animation:none;}}
 
-  /* pinout diagram */
+  /* pinout diagram & active buses */
   .pinout{
     margin-top:52px;
     display:flex;
@@ -337,9 +337,52 @@
   @keyframes dataFlowIn{ 0%{transform:translateX(-100%);} 40%,100%{transform:translateX(100%);} }
   @keyframes dataFlowOut{ 0%{transform:translateX(100%);} 40%,100%{transform:translateX(-100%);} }
   @media (prefers-reduced-motion: reduce){.pin-line::after{animation:none; display:none;}}
+
   .pin-label-left{order:1; text-align:right; width:110px; padding-right:6px;}
   .pin-label-right{text-align:left; width:110px; padding-left:6px;}
   @media (max-width:720px){.pinout{display:none;}}
+
+  /* RF Propagation Animation */
+  .rf-icon{
+    display:inline-block;
+    position:relative;
+    width:20px; height:20px;
+    margin-left:8px;
+    vertical-align:middle;
+    transform:translateY(-2px);
+  }
+  .rf-icon .dot{
+    position:absolute; bottom:2px; left:2px;
+    width:4px; height:4px; border-radius:50%;
+    background:var(--copper);
+  }
+  .rf-icon .wave{
+    position:absolute; bottom:3px; left:3px;
+    border-top:2px solid var(--copper);
+    border-right:2px solid var(--copper);
+    border-radius:0 100% 0 0;
+    opacity:0;
+  }
+  .rf-icon .wave1{ width:10px; height:10px; animation:rfPropagate 2s cubic-bezier(0.1,0.8,0.3,1) infinite; }
+  .rf-icon .wave2{ width:16px; height:16px; animation:rfPropagate 2s cubic-bezier(0.1,0.8,0.3,1) infinite 0.4s; }
+  @keyframes rfPropagate{
+    0%{ opacity:0; transform:scale(0.5); }
+    20%{ opacity:1; }
+    80%{ opacity:0; transform:scale(1.1); }
+    100%{ opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce){.rf-icon .wave{animation:none; opacity:1;}}
+
+  /* Glitch/decode effect on hover */
+  .decode-text{ position:relative; display:inline-block; cursor:default; }
+  .decode-text:hover{ animation: decodeFlicker 0.4s steps(2, end) forwards; color:var(--copper); }
+  @keyframes decodeFlicker{
+    0%{ opacity:0.8; transform:skewX(-10deg); filter:drop-shadow(2px 0 0 rgba(224,164,92,0.5)); }
+    25%{ opacity:0.4; transform:skewX(10deg); filter:drop-shadow(-2px 0 0 rgba(110,155,224,0.5)); }
+    50%{ opacity:1; transform:skewX(-5deg); }
+    75%{ opacity:0.6; transform:skewX(5deg); }
+    100%{ opacity:1; transform:none; filter:none; }
+  }
 
   /* ---------- SECTION SCAFFOLD ---------- */
   section.block{
@@ -520,48 +563,6 @@
   footer .bottom-line{
     margin-top:40px; padding-top:18px; border-top:1px solid #33373D; font-family:'IBM Plex Mono', monospace;
     font-size:11.5px; color:#7A7F86; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
-  }
-
-  /* rf animation */
-  .rf-icon{
-    display:inline-block;
-    position:relative;
-    width:20px; height:20px;
-    margin-left:8px;
-    vertical-align:middle;
-    transform:translateY(-2px);
-  }
-  .rf-icon .dot{
-    position:absolute; bottom:2px; left:2px;
-    width:4px; height:4px; border-radius:50%;
-    background:var(--copper);
-  }
-  .rf-icon .wave{
-    position:absolute; bottom:3px; left:3px;
-    border-top:2px solid var(--copper);
-    border-right:2px solid var(--copper);
-    border-radius:0 100% 0 0;
-    opacity:0;
-  }
-  .rf-icon .wave1{ width:10px; height:10px; animation:rfPropagate 2s cubic-bezier(0.1,0.8,0.3,1) infinite; }
-  .rf-icon .wave2{ width:16px; height:16px; animation:rfPropagate 2s cubic-bezier(0.1,0.8,0.3,1) infinite 0.4s; }
-  @keyframes rfPropagate{
-    0%{ opacity:0; transform:scale(0.5); }
-    20%{ opacity:1; }
-    80%{ opacity:0; transform:scale(1.1); }
-    100%{ opacity:0; }
-  }
-  @media (prefers-reduced-motion: reduce){.rf-icon .wave{animation:none; opacity:1;}}
-
-  /* glitch/decode effect on hover */
-  .decode-text{ position:relative; display:inline-block; cursor:default; }
-  .decode-text:hover{ animation: decodeFlicker 0.4s steps(2, end) forwards; color:var(--copper); }
-  @keyframes decodeFlicker{
-    0%{ opacity:0.8; transform:skewX(-10deg); filter:drop-shadow(2px 0 0 rgba(224,164,92,0.5)); }
-    25%{ opacity:0.4; transform:skewX(10deg); filter:drop-shadow(-2px 0 0 rgba(110,155,224,0.5)); }
-    50%{ opacity:1; transform:skewX(-5deg); }
-    75%{ opacity:0.6; transform:skewX(5deg); }
-    100%{ opacity:1; transform:none; filter:none; }
   }
 
   /* scroll-to-top */
@@ -982,3 +983,5 @@
 
 </body>
 </html>
+
+
