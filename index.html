@@ -94,8 +94,19 @@
     margin-left:22px;
     border-bottom:1px solid transparent;
     padding-bottom:2px;
+    position:relative;
+    transition:color 0.2s ease;
   }
-  header.frame nav a:hover{border-bottom:1px solid var(--ink-soft);}
+  header.frame nav a::after{
+    content:'';
+    position:absolute;
+    left:0; bottom:-1px;
+    width:0; height:1px;
+    background:var(--copper);
+    transition:width 0.25s ease;
+  }
+  header.frame nav a:hover::after{width:100%;}
+  header.frame nav a:hover{border-bottom:1px solid transparent; color:var(--copper);}
   header.frame nav a.active{border-bottom:1px solid var(--copper); color:var(--copper);}
 
   .theme-toggle{
@@ -159,6 +170,17 @@
     opacity:0;
     animation: fadeUp 0.6s ease 0.2s forwards;
   }
+  .cursor-blink{
+    display:inline-block;
+    color:var(--copper);
+    animation: cursorBlink 1s steps(1) infinite;
+    margin-left:2px;
+  }
+  @keyframes cursorBlink{
+    0%,49%{opacity:1;}
+    50%,100%{opacity:0;}
+  }
+  @media (prefers-reduced-motion: reduce){.cursor-blink{animation:none;}}
   @keyframes fadeUp{
     from{opacity:0; transform:translateY(10px);}
     to{opacity:1; transform:translateY(0);}
@@ -308,7 +330,13 @@
     color:var(--copper);
     border:1px solid var(--copper);
     padding:2px 7px;
+    animation: badgePulse 3s ease-in-out infinite;
   }
+  @keyframes badgePulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(166,98,10,0.25);}
+    50%{box-shadow:0 0 0 4px rgba(166,98,10,0);}
+  }
+  @media (prefers-reduced-motion: reduce){.desig{animation:none;}}
   .block-head h2{font-family:'IBM Plex Mono', monospace; font-size:1.5rem; margin:0; font-weight:600;}
 
   .reveal{opacity:0; transform:translateY(16px); transition:opacity 0.5s ease, transform 0.5s ease;}
@@ -342,7 +370,14 @@
     background:var(--paper-2);
     margin-bottom:22px;
     overflow:hidden;
+    transition:transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   }
+  .datasheet-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 8px 20px rgba(0,0,0,0.12);
+    border-color:var(--copper);
+  }
+  @media (prefers-reduced-motion: reduce){.datasheet-card{transition:none;} .datasheet-card:hover{transform:none;}}
   .ds-visual{
     width:100%;
     height:200px;
@@ -403,8 +438,8 @@
   @media (max-width:600px){.exp-item{grid-template-columns:1fr;}}
 
   /* ---------- ACHIEVEMENTS ---------- */
-  .ach-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:1px; background:var(--paper); border:1px solid var(--line-strong);}
-  .ach-cell{background:var(--paper); padding:16px 18px; border:1px solid var(--line-strong); margin:-1px 0 0 -1px;}
+  .ach-grid{display:flex; flex-wrap:wrap; gap:12px;}
+  .ach-cell{background:var(--paper); padding:16px 18px; border:1px solid var(--line-strong); flex:1 1 260px; min-width:240px;}
   .ach-cell .role{font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:var(--copper); margin-bottom:4px;}
   .ach-cell p{margin:0; font-size:14px; color:var(--ink-soft);}
 
@@ -521,7 +556,7 @@
   <section class="hero">
     <div class="part-no">DEVICE NO. SV-2027-ECE</div>
     <h1 class="name">SUDARSHAN&nbsp;V</h1>
-    <div class="tagline">Electronics and Communication Engineering student with hands-on experience in digital hardware design, RF and antenna systems, embedded systems, and wireless communication.</div>
+    <div class="tagline">Electronics and Communication Engineering student with hands-on experience in digital hardware design, RF and antenna systems, embedded systems, and wireless communication.<span class="cursor-blink">_</span></div>
     <div class="contact-row">
       <span>Chennai, Tamil Nadu</span>
       <a href="mailto:sudarshan060617@gmail.com">sudarshan060617@gmail.com</a>
