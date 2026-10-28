@@ -1,35 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- ============================================================
+     SUDARSHAN V — PORTFOLIO
+     Single-file static site (HTML + CSS + JS, no build step).
+     Hosted on GitHub Pages at https://sudarshan.is-a.dev
+     Layout of this file:
+       1. head   : meta tags, fonts
+       2. style  : theme variables, base layout, sections, demos, overlays
+       3. body   : header, hero, sections, footer/contact, overlays
+       4. script : theme, nav, terminal, command palette, demos, form
+     ============================================================ -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sudarshan V — Hardware Engineer</title>
 <meta name="description" content="Portfolio of Sudarshan V — Electronics and Communication Engineering student specializing in ASIC design, RF and antenna engineering, and embedded systems.">
+<!-- Favicon: inline SVG so no extra file request is needed -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2314171A'/%3E%3Ctext x='50' y='68' font-size='58' font-family='monospace' font-weight='700' fill='%23A6620A' text-anchor='middle'%3ESV%3C/text%3E%3C/svg%3E">
+<!-- Open Graph / Twitter cards: what link previews show when the site is shared -->
 <meta property="og:title" content="Sudarshan V — Hardware Engineer">
 <meta property="og:description" content="ASIC design, RF/antenna engineering, and embedded systems — a taped-out SKY130 chip, THz metamaterial sensing, and more.">
-<meta property="og:image" content="https://sudarshan-veera.github.io/images/profile.jpg">
+<meta property="og:image" content="https://sudarshan.is-a.dev/images/profile.jpg">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://sudarshan-veera.github.io">
+<meta property="og:url" content="https://sudarshan.is-a.dev">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Sudarshan V — Hardware Engineer">
 <meta name="twitter:description" content="ASIC design, RF/antenna engineering, and embedded systems.">
-<meta name="twitter:image" content="https://sudarshan-veera.github.io/images/profile.jpg">
+<meta name="twitter:image" content="https://sudarshan.is-a.dev/images/profile.jpg">
+<!-- Fonts: IBM Plex Mono (headings, code-like text) + IBM Plex Sans (body) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+  /* =========================================================
+     1. THEME VARIABLES
+     Light theme is the default. Dark theme overrides them when
+     <html data-theme="dark"> is set by the toggle in the header.
+     ========================================================= */
   :root{
-    --paper:#EFEDE6;
-    --paper-2:#E5E1D6;
-    --ink:#14171A;
-    --ink-soft:#4B5157;
+    --paper:#EFEDE6;       /* page background */
+    --paper-2:#E5E1D6;     /* cards / raised surfaces */
+    --ink:#14171A;         /* main text */
+    --ink-soft:#4B5157;    /* secondary text */
     --blue:#2452A8;
     --blue-dim:#7C93BD;
-    --copper:#A6620A;
-    --line:#C9C4B8;
-    --line-strong:#A9A398;
+    --copper:#A6620A;      /* accent colour */
+    --line:#C9C4B8;        /* grid-paper lines */
+    --line-strong:#A9A398; /* borders */
     --good:#2E6B4F;
     --shadow: 0 1px 0 rgba(0,0,0,0.04);
+    /* Colours used to tell apart fields in the NGAP byte explorer */
+    --g0:#A6620A; --g1:#2452A8; --g2:#2E6B4F; --g3:#7A3FA0; --g4:#B03A2E;
   }
   html[data-theme="dark"]{
     --paper:#14171A;
@@ -42,7 +62,12 @@
     --line:#33383D;
     --line-strong:#454B51;
     --good:#5FBE92;
+    --g0:#E0A45C; --g1:#6E9BE0; --g2:#5FBE92; --g3:#B98AE0; --g4:#E27D6F;
   }
+
+  /* =========================================================
+     2. BASE / LAYOUT
+     ========================================================= */
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{
@@ -56,7 +81,12 @@
   }
   .mono{font-family:'IBM Plex Mono', monospace;}
   a{color:var(--blue);}
+  /* Keep anchored sections clear of the sticky header when jumping to them */
+  section.block, footer.frame, .datasheet-card, #ngap-demo{scroll-margin-top:64px;}
+  /* Visible keyboard focus everywhere */
+  :focus-visible{outline:2px solid var(--copper); outline-offset:2px;}
 
+  /* The "graph paper" sheet that holds the whole page */
   .sheet{
     max-width:1040px;
     margin:0 auto;
@@ -69,7 +99,16 @@
     border-right:1px solid var(--line-strong);
   }
 
-  /* ---------- HEADER / NAV ---------- */
+  /* Thin reading-progress bar pinned to the very top of the window */
+  .progress{
+    position:fixed; top:0; left:0; height:3px; width:0;
+    background:var(--copper); z-index:100;
+    transition:width 0.1s linear;
+  }
+
+  /* =========================================================
+     3. HEADER / NAV
+     ========================================================= */
   header.frame{
     border-bottom:1px solid var(--line-strong);
     padding:14px 28px;
@@ -97,6 +136,7 @@
     position:relative;
     transition:color 0.2s ease;
   }
+  /* Underline that grows from the left on hover */
   header.frame nav a::after{
     content:'';
     position:absolute;
@@ -109,8 +149,9 @@
   header.frame nav a:hover{border-bottom:1px solid transparent; color:var(--copper);}
   header.frame nav a.active{border-bottom:1px solid var(--copper); color:var(--copper);}
 
+  /* Small bordered buttons in the header (theme toggle, command palette) */
   .theme-toggle{
-    margin-left:24px;
+    margin-left:14px;
     display:flex;
     align-items:center;
     gap:6px;
@@ -122,12 +163,19 @@
     font-family:'IBM Plex Mono', monospace;
     font-size:11px;
   }
+  .theme-toggle:first-of-type{margin-left:24px;}
   .theme-toggle:hover{border-color:var(--ink-soft); color:var(--ink);}
   .theme-toggle .dot{
     width:6px;height:6px;border-radius:50%;
     background:var(--good);
   }
+  kbd{
+    font-family:'IBM Plex Mono', monospace; font-size:10.5px;
+    border:1px solid var(--line-strong); border-bottom-width:2px;
+    padding:0 5px; background:var(--paper-2); color:var(--ink);
+  }
 
+  /* Hamburger button (mobile only) */
   .burger{
     display:none;
     flex-direction:column;
@@ -139,7 +187,9 @@
   }
   .burger span{width:20px; height:2px; background:var(--ink);}
 
-  /* ---------- HERO ---------- */
+  /* =========================================================
+     4. HERO
+     ========================================================= */
   .hero{
     padding:64px 28px 40px;
     border-bottom:1px solid var(--line-strong);
@@ -180,12 +230,13 @@
     0%,49%{opacity:1;}
     50%,100%{opacity:0;}
   }
-  @media (prefers-reduced-motion: reduce){.cursor-blink{animation:none;}}
   @keyframes fadeUp{
     from{opacity:0; transform:translateY(10px);}
     to{opacity:1; transform:translateY(0);}
   }
+  /* Respect users who ask for less motion */
   @media (prefers-reduced-motion: reduce){
+    .cursor-blink{animation:none;}
     .part-no,h1.name,.tagline{animation:none; opacity:1;}
   }
   .contact-row{
@@ -208,7 +259,39 @@
   .copy-btn:hover{border-color:var(--ink-soft); color:var(--ink);}
   .copy-btn.copied{color:var(--good); border-color:var(--good);}
 
-  /* waveform strip */
+  /* "At a glance" numbers that count up when scrolled into view */
+  .stats{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px;
+    margin-top:30px; max-width:640px;
+  }
+  .stat{border:1px solid var(--line-strong); background:var(--paper); padding:10px 12px;}
+  .stat .num{font-family:'IBM Plex Mono', monospace; font-weight:700; font-size:1.35rem; color:var(--copper);}
+  .stat .lbl{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink-soft);}
+
+  /* ---------- Mini terminal in the hero ---------- */
+  .term{
+    margin-top:30px; max-width:640px;
+    background:#101316; color:#D6D3CB;
+    border:1px solid var(--line-strong);
+    font:13px/1.55 'IBM Plex Mono', monospace;
+  }
+  .term-bar{
+    display:flex; gap:6px; align-items:center; padding:7px 10px;
+    border-bottom:1px solid #2A2F34; color:#7A7F86; font-size:11px;
+  }
+  .term-bar i{width:9px; height:9px; border-radius:50%; background:#33383D; display:inline-block;}
+  .term-bar span{margin-left:8px;}
+  .term-body{height:230px; overflow-y:auto; padding:10px 12px; cursor:text;}
+  .term-line{white-space:pre-wrap; word-break:break-word;}
+  .term-line .p{color:#E0A45C;}          /* prompt "$" */
+  .term-line.dim{color:#7A7F86;}
+  .term-row{display:flex; gap:8px; align-items:center;}
+  .term-input{
+    flex:1; min-width:0; background:transparent; border:0; outline:0;
+    color:inherit; font:inherit; caret-color:#E0A45C;
+  }
+
+  /* Scrolling waveform strip (decorative) */
   .waveform{
     margin-top:36px;
     width:100%;
@@ -230,7 +313,7 @@
   }
   @media (prefers-reduced-motion: reduce){.wave-line{animation:none;}}
 
-  /* pinout diagram & active buses */
+  /* ---------- Chip "pinout" diagram around the photo ---------- */
   .pinout{
     margin-top:52px;
     display:flex;
@@ -246,6 +329,7 @@
     font-family:'IBM Plex Mono', monospace;
     overflow:hidden;
   }
+  /* Light sweep that scans across the chip */
   .chip::after{
     content:'';
     position:absolute;
@@ -268,17 +352,17 @@
     object-fit:contain;
     background:#000;
     display:block;
+    cursor:zoom-in;     /* click opens the lightbox */
   }
-  .chip .cap{
-    padding:14px 6px 18px;
-  }
+  .chip .cap{padding:14px 6px 18px;}
+  /* Pin-1 marker LED */
   .chip .pin1{
     position:absolute;
     top:10px; left:10px;
     width:8px;height:8px;
     border-radius:50%;
     background:var(--copper);
-    z-index:2;
+    z-index:4;
     animation: ledBlink 2.2s ease-in-out infinite;
   }
   @keyframes ledBlink{
@@ -288,16 +372,8 @@
   @media (prefers-reduced-motion: reduce){.chip .pin1{animation:none;}}
   .chip .id{font-size:13px; letter-spacing:0.06em; opacity:0.75;}
   .chip .role{font-size:15px; margin-top:6px; font-weight:600;}
-  .pins-wrap{
-    display:flex;
-    align-items:center;
-    gap:0;
-  }
-  .pin-col{
-    display:flex;
-    flex-direction:column;
-    gap:26px;
-  }
+  .pins-wrap{display:flex; align-items:center; gap:0;}
+  .pin-col{display:flex; flex-direction:column; gap:26px;}
   .pin{
     display:flex;
     align-items:center;
@@ -316,6 +392,7 @@
     position:relative;
     overflow:hidden;
   }
+  /* Animated "data flowing along the pin" effect */
   .pin-line::after{
     content:'';
     position:absolute;
@@ -337,12 +414,11 @@
   @keyframes dataFlowIn{ 0%{transform:translateX(-100%);} 40%,100%{transform:translateX(100%);} }
   @keyframes dataFlowOut{ 0%{transform:translateX(100%);} 40%,100%{transform:translateX(-100%);} }
   @media (prefers-reduced-motion: reduce){.pin-line::after{animation:none; display:none;}}
-
   .pin-label-left{order:1; text-align:right; width:110px; padding-right:6px;}
   .pin-label-right{text-align:left; width:110px; padding-left:6px;}
   @media (max-width:720px){.pinout{display:none;}}
 
-  /* RF Propagation Animation */
+  /* Radio-wave icon next to the LoRa title and the Contact heading */
   .rf-icon{
     display:inline-block;
     position:relative;
@@ -373,7 +449,7 @@
   }
   @media (prefers-reduced-motion: reduce){.rf-icon .wave{animation:none; opacity:1;}}
 
-  /* Glitch/decode effect on hover */
+  /* Glitch flicker when hovering the brand name */
   .decode-text{ position:relative; display:inline-block; cursor:default; }
   .decode-text:hover{ animation: decodeFlicker 0.4s steps(2, end) forwards; color:var(--copper); }
   @keyframes decodeFlicker{
@@ -384,12 +460,15 @@
     100%{ opacity:1; transform:none; filter:none; }
   }
 
-  /* ---------- SECTION SCAFFOLD ---------- */
+  /* =========================================================
+     5. SECTION SCAFFOLD (shared by every section)
+     ========================================================= */
   section.block{
     border-bottom:1px solid var(--line-strong);
     padding:44px 28px;
   }
   .block-head{display:flex; align-items:baseline; gap:14px; margin-bottom:28px;}
+  /* The small numbered badge ("00", "01", ...) beside each heading */
   .desig{
     font-family:'IBM Plex Mono', monospace;
     font-size:12px;
@@ -405,14 +484,15 @@
   @media (prefers-reduced-motion: reduce){.desig{animation:none;}}
   .block-head h2{font-family:'IBM Plex Mono', monospace; font-size:1.5rem; margin:0; font-weight:600;}
 
+  /* Sections fade/slide in once when scrolled into view (class "in" added by JS) */
   .reveal{opacity:0; transform:translateY(16px); transition:opacity 0.5s ease, transform 0.5s ease;}
   .reveal.in{opacity:1; transform:translateY(0);}
   @media (prefers-reduced-motion: reduce){.reveal{opacity:1; transform:none;}}
 
-  /* ---------- OBJECTIVE ---------- */
+  /* ---------- Objective ---------- */
   .objective p{max-width:680px; font-size:1.05rem;}
 
-  /* ---------- BOM / SKILLS TABLE ---------- */
+  /* ---------- Skills table ---------- */
   table.bom{width:100%; border-collapse:collapse; font-size:14px;}
   table.bom th{
     text-align:left; font-family:'IBM Plex Mono', monospace; font-weight:600;
@@ -420,6 +500,18 @@
   }
   table.bom td{padding:12px 10px; border-bottom:1px solid var(--line); vertical-align:top;}
   table.bom td.cat{font-family:'IBM Plex Mono', monospace; font-weight:600; white-space:nowrap; color:var(--blue);}
+  .skill-hint{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft); margin:0 0 10px;}
+  .skill-status{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--copper); min-height:1.4em; margin-top:10px;}
+  /* Each skill is a clickable chip; clicking highlights the projects that used it */
+  .skill-chip{
+    font-family:'IBM Plex Mono', monospace; font-size:12px;
+    border:1px solid var(--line-strong); background:var(--paper-2); color:var(--ink);
+    padding:2px 8px; margin:2px 4px 2px 0; cursor:pointer;
+    transition:border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  }
+  .skill-chip:hover{border-color:var(--copper); color:var(--copper);}
+  .skill-chip.on{background:var(--copper); color:var(--paper); border-color:var(--copper);}
+  .skill-chip.has{border-color:var(--copper);}   /* skills used by at least one project */
   .cert-list{margin-top:26px;}
   .cert-list h3{font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--ink-soft); font-weight:500; margin-bottom:10px;}
   .cert-tags{display:flex; flex-wrap:wrap; gap:8px;}
@@ -430,13 +522,25 @@
   }
   .cert-tags a:hover{border-color:var(--blue); color:var(--blue);}
 
-  /* ---------- PROJECTS ---------- */
+  /* =========================================================
+     6. PROJECT CARDS ("datasheets")
+     ========================================================= */
+  .filter-row{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:-8px 0 20px;}
+  .filter-row .count-note{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft); margin-left:6px;}
+  .chip-btn{
+    font-family:'IBM Plex Mono', monospace; font-size:12px;
+    border:1px solid var(--line-strong); background:var(--paper); color:var(--ink-soft);
+    padding:4px 10px; cursor:pointer;
+  }
+  .chip-btn:hover{border-color:var(--ink-soft); color:var(--ink);}
+  .chip-btn.on{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+
   .datasheet-card{
     border:1px solid var(--line-strong);
     background:var(--paper-2);
     margin-bottom:22px;
     overflow:hidden;
-    transition:transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    transition:transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, opacity 0.25s ease;
   }
   .datasheet-card:hover{
     transform:translateY(-4px);
@@ -444,33 +548,20 @@
     border-color:var(--copper);
   }
   @media (prefers-reduced-motion: reduce){.datasheet-card{transition:none;} .datasheet-card:hover{transform:none;}}
-  .ds-visual{
-    width:100%;
-    height:200px;
-    background:var(--ink);
-    position:relative;
-    overflow:hidden;
-  }
-  .ds-visual img{
-    width:100%; height:100%; object-fit:cover;
-    filter:grayscale(0.55) contrast(1.05);
-    transition:transform 0.4s ease, filter 0.4s ease;
-    display:block;
-  }
-  .datasheet-card:hover .ds-visual img{transform:scale(1.03); filter:grayscale(0.1) contrast(1.05);}
-  .ds-visual .ds-tag{
-    position:absolute; bottom:8px; left:8px;
-    font-family:'IBM Plex Mono', monospace;
-    font-size:11px; color:#EFEDE6; background:rgba(20,23,26,0.72);
-    padding:3px 8px;
-  }
+  .is-hidden{display:none !important;}                 /* removed by the tag filter */
+  .skill-dim{opacity:0.35;}                            /* not using the selected skill */
+  .skill-hit{border-color:var(--copper) !important; box-shadow:0 0 0 2px rgba(166,98,10,0.25);}
   .datasheet-card .ds-head{
-    display:flex; justify-content:space-between; align-items:center;
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
     padding:12px 18px; border-bottom:1px solid var(--line-strong); font-family:'IBM Plex Mono', monospace;
   }
   .datasheet-card .ds-head .title{font-weight:600; font-size:1rem;}
   .datasheet-card .ds-head .year{font-size:12px; color:var(--ink-soft);}
   .datasheet-card .ds-body{padding:16px 18px 20px;}
+  .tag-row{display:flex; gap:6px; margin:10px 0 0; flex-wrap:wrap;}
+  .tag{font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.04em; text-transform:uppercase;
+       border:1px solid var(--line-strong); color:var(--ink-soft); padding:0 6px;}
+  /* Spec grid: key/value pairs like a datasheet table */
   .spec-grid{
     display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px 20px;
     margin:14px 0 10px; padding:14px 0; border-top:1px dashed var(--line-strong); border-bottom:1px dashed var(--line-strong);
@@ -480,14 +571,16 @@
   .spec-grid .v{font-weight:600;}
   .ds-body ul{margin:12px 0 6px; padding-left:18px;}
   .ds-body li{margin-bottom:6px; font-size:14.5px;}
+  .btn-row{display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;}
   .ds-more-btn{
     background:none; border:1px solid var(--line-strong); color:var(--ink-soft);
-    font-family:'IBM Plex Mono', monospace; font-size:12px; padding:5px 10px; cursor:pointer; margin-top:6px;
+    font-family:'IBM Plex Mono', monospace; font-size:12px; padding:5px 10px; cursor:pointer;
   }
   .ds-more-btn:hover{border-color:var(--ink-soft); color:var(--ink);}
-  .ds-extra{
-    max-height:0; overflow:hidden; transition:max-height 0.35s ease;
-  }
+  .ds-more-btn.demo-btn{border-color:var(--copper); color:var(--copper);}
+  .ds-more-btn.demo-btn:hover{background:var(--copper); color:var(--paper);}
+  /* "View details" panel animates its height */
+  .ds-extra{max-height:0; overflow:hidden; transition:max-height 0.35s ease;}
   .ds-extra.open{max-height:400px;}
   .ds-extra-inner{padding-top:10px;}
   .ds-link{
@@ -495,61 +588,135 @@
     text-decoration:none; border-bottom:1px solid var(--blue-dim);
   }
 
-  /* ---------- EXPERIENCE ---------- */
-  .exp-item{display:grid; grid-template-columns:150px 1fr; gap:20px; margin-bottom:22px;}
+  /* =========================================================
+     7. INTERACTIVE DEMO PANELS
+     ========================================================= */
+  .demo{
+    margin-top:14px; padding:14px; background:var(--paper);
+    border:1px dashed var(--copper);
+  }
+  .demo-title{font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:13px; margin-bottom:2px;}
+  .demo-note{display:block; font-family:'IBM Plex Mono', monospace; font-weight:400; font-size:11px; color:var(--ink-soft); margin-bottom:8px;}
+  .demo canvas{width:100%; height:220px; display:block; background:var(--paper-2); border:1px solid var(--line); touch-action:none;}
+  .demo-controls{display:flex; flex-wrap:wrap; gap:10px 22px; margin-top:10px; align-items:center;}
+  .demo-controls label{font-family:'IBM Plex Mono', monospace; font-size:12px; display:flex; align-items:center; gap:8px; color:var(--ink-soft);}
+  .demo-controls output{color:var(--ink); min-width:4.5em; font-weight:600;}
+  .demo input[type=range]{accent-color:var(--copper); width:150px;}
+  .demo-readout{font-family:'IBM Plex Mono', monospace; font-size:12.5px; margin-top:10px; color:var(--ink-soft);}
+  .demo-readout b{color:var(--ink);}
+  .seg{display:inline-flex; border:1px solid var(--line-strong);}
+  .seg button{
+    background:var(--paper); color:var(--ink-soft); border:0; border-right:1px solid var(--line-strong);
+    font-family:'IBM Plex Mono', monospace; font-size:11.5px; padding:4px 9px; cursor:pointer;
+  }
+  .seg button:last-child{border-right:0;}
+  .seg button.on{background:var(--ink); color:var(--paper);}
+  .mini-btn{
+    background:var(--paper); color:var(--ink); border:1px solid var(--line-strong);
+    font-family:'IBM Plex Mono', monospace; font-size:11.5px; padding:4px 10px; cursor:pointer;
+  }
+  .mini-btn:hover{border-color:var(--copper); color:var(--copper);}
+  .led{display:inline-block; width:9px; height:9px; border-radius:50%; background:var(--line-strong); margin-right:6px; vertical-align:middle;}
+  .led.on{background:var(--copper); box-shadow:0 0 8px 2px var(--copper);}
+
+  /* Token-ring SVG */
+  .ring-svg{width:100%; max-width:460px; height:auto; display:block; margin:0 auto; background:var(--paper-2); border:1px solid var(--line);}
+  .ring-svg .edge{stroke:var(--line-strong); stroke-width:1.5; fill:none;}
+  .ring-svg .node circle{fill:var(--paper); stroke:var(--line-strong); stroke-width:2; cursor:pointer;}
+  .ring-svg .node text{font-family:'IBM Plex Mono', monospace; font-size:11px; fill:var(--ink); text-anchor:middle; pointer-events:none;}
+  .ring-svg .node.holder circle{stroke:var(--copper); stroke-width:3.5; fill:var(--paper-2);}
+  .ring-svg .node .q{fill:var(--copper); font-size:10px;}
+  .ring-svg .token{fill:var(--copper);}
+  .ring-svg .pulse{stroke:var(--blue); stroke-width:2.5; stroke-dasharray:6 6; animation:pulseDash 0.6s linear forwards;}
+  @keyframes pulseDash{from{stroke-dashoffset:24; opacity:1;} to{stroke-dashoffset:0; opacity:0.1;}}
+  .ring-svg .center-t{font-family:'IBM Plex Mono', monospace; font-size:11px; fill:var(--ink-soft); text-anchor:middle;}
+
+  /* NGAP byte explorer */
+  .bytes{display:flex; flex-wrap:wrap; gap:4px; font-family:'IBM Plex Mono', monospace; font-size:13px;}
+  .byte{
+    padding:3px 5px; cursor:pointer; border:0; border-bottom:2px solid var(--c, var(--line-strong));
+    background:color-mix(in srgb, var(--c, var(--line)) 14%, transparent); color:var(--ink);
+    font:inherit; transition:background 0.15s ease, transform 0.15s ease;
+  }
+  .byte.dim{opacity:0.3;}
+  .byte.sel{background:var(--c); color:var(--paper); transform:translateY(-2px);}
+  .field-box{
+    margin-top:12px; border:1px solid var(--line-strong); background:var(--paper-2);
+    padding:10px 12px; font-size:13.5px; min-height:78px;
+  }
+  .field-box .fn{font-family:'IBM Plex Mono', monospace; font-weight:600;}
+  .field-box .fh{font-family:'IBM Plex Mono', monospace; color:var(--copper); font-size:12.5px;}
+  .verdict{font-family:'IBM Plex Mono', monospace; font-size:12.5px; margin-top:10px;}
+  .verdict.ok{color:var(--good);}
+  .verdict.bad{color:var(--g4);}
+
+  /* ANGEL BOT dashboard */
+  .bot-grid{display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:14px;}
+  @media (max-width:640px){.bot-grid{grid-template-columns:1fr;}}
+  .bot-grid canvas{height:210px; cursor:crosshair;}
+  .gauge{height:14px; border:1px solid var(--line-strong); background:var(--paper-2); position:relative; margin:6px 0 4px;}
+  .gauge i{position:absolute; inset:0 auto 0 0; width:0; background:var(--good); transition:background 0.2s ease;}
+  .gauge.alarm i{background:var(--g4);}
+  .gauge b{position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--ink);}
+  .mic{display:flex; gap:3px; align-items:flex-end; height:44px; margin:8px 0;}
+  .mic i{flex:1; background:var(--blue-dim); min-height:3px; transition:height 0.08s linear;}
+  .dpad{display:grid; grid-template-columns:repeat(3,38px); grid-template-rows:repeat(2,34px); gap:4px; margin:8px 0;}
+  .dpad button{font-family:'IBM Plex Mono', monospace; background:var(--paper); border:1px solid var(--line-strong); color:var(--ink); cursor:pointer;}
+  .dpad button:hover{border-color:var(--copper); color:var(--copper);}
+  .dpad .up{grid-column:2;}
+  .botlog{font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-soft); min-height:5.2em; white-space:pre-wrap;}
+  .alert-tag{font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:700; color:var(--g4); visibility:hidden;}
+  .alert-tag.show{visibility:visible;}
+
+  /* =========================================================
+     8. EXPERIENCE / ACHIEVEMENTS / LANGUAGES
+     ========================================================= */
+  .exp-item{display:grid; grid-template-columns:150px 1fr; gap:20px; margin-bottom:22px; transition:opacity 0.25s ease;}
   .exp-item .when{font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--ink-soft);}
   .exp-item h3{margin:0 0 8px; font-size:1.05rem;}
   .exp-item ul{margin:0; padding-left:18px;}
   .exp-item li{margin-bottom:6px;}
   @media (max-width:600px){.exp-item{grid-template-columns:1fr;}}
-
-  /* ---------- ACHIEVEMENTS ---------- */
   .ach-grid{display:flex; flex-wrap:wrap; gap:12px;}
   .ach-cell{background:var(--paper); padding:16px 18px; border:1px solid var(--line-strong); flex:0 1 300px; min-width:240px;}
   .ach-cell .role{font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:var(--copper); margin-bottom:4px;}
   .ach-cell p{margin:0; font-size:14px; color:var(--ink-soft);}
-
-  /* ---------- LANGUAGES ---------- */
   .lang-row{display:flex; flex-wrap:wrap; gap:22px; font-family:'IBM Plex Mono', monospace; font-size:13px;}
   .lang-row .lvl{color:var(--ink-soft);}
 
-  /* ---------- FOOTER / CONTACT ---------- */
-  footer.frame{padding:48px 28px 40px; background:var(--ink); color:var(--paper);}
-  footer.frame .desig{border-color:var(--copper); color:var(--copper);}
+  /* =========================================================
+     9. FOOTER / CONTACT FORM
+     ========================================================= */
+  /* The contact block is dark in BOTH themes, so it uses fixed colours (not the theme variables) */
+  footer.frame{padding:48px 28px 40px; background:#14171A; color:#EFEDE6;}
+  footer.frame .desig{border-color:#E0A45C; color:#E0A45C;}
   footer.frame h2{font-family:'IBM Plex Mono', monospace; font-size:1.5rem; margin:0 0 18px;}
   .contact-grid{
     display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:18px 24px;
     margin-top:24px; font-family:'IBM Plex Mono', monospace; font-size:13.5px;
   }
   .contact-grid .k{color:#8A8F97; display:block; font-size:11.5px; margin-bottom:4px;}
-  .contact-grid a{color:var(--paper); text-decoration:none; border-bottom:1px solid #4A4F55;}
-  .contact-grid a:hover{border-color:var(--paper);}
-
-  .contact-form{
-    margin-top:28px;
-    max-width:480px;
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-  }
+  .contact-grid a{color:#EFEDE6; text-decoration:none; border-bottom:1px solid #4A4F55;}
+  .contact-grid a:hover{border-color:#EFEDE6;}
+  .contact-form{margin-top:28px; max-width:480px; display:flex; flex-direction:column; gap:12px;}
   .form-row{display:flex; gap:12px;}
   .contact-form input, .contact-form textarea{
     background:#1C2024;
     border:1px solid #33373D;
-    color:var(--paper);
+    color:#EFEDE6;
     font-family:'IBM Plex Sans', sans-serif;
     font-size:14px;
     padding:10px 12px;
     width:100%;
     resize:vertical;
   }
-  .contact-form input:focus, .contact-form textarea:focus{
-    outline:none;
-    border-color:var(--copper);
-  }
+  .contact-form input:focus, .contact-form textarea:focus{outline:none; border-color:#E0A45C;}
+  /* Keep browser autofill from turning the fields light blue */
+  .contact-form input:-webkit-autofill{-webkit-box-shadow:0 0 0 100px #1C2024 inset; -webkit-text-fill-color:#EFEDE6;}
+  .contact-form .hp{position:absolute; left:-9999px; width:1px; height:1px; opacity:0;}   /* spam honeypot */
   .form-submit{
     align-self:flex-start;
-    background:var(--copper);
+    background:#E0A45C;
     color:#14171A;
     border:none;
     font-family:'IBM Plex Mono', monospace;
@@ -558,14 +725,47 @@
     padding:10px 20px;
     cursor:pointer;
   }
-  .form-submit:hover{background:#c07a2e;}
+  .form-submit:hover{background:#EBB877;}
+  .form-submit:disabled{opacity:0.6; cursor:wait;}
+  .form-status{font-family:'IBM Plex Mono', monospace; font-size:12.5px; min-height:1.5em; color:#B6BAC0;}
+  .form-status.ok{color:#5FBE92;}
+  .form-status.err{color:#E27D6F;}
   @media (max-width:500px){.form-row{flex-direction:column;}}
   footer .bottom-line{
     margin-top:40px; padding-top:18px; border-top:1px solid #33373D; font-family:'IBM Plex Mono', monospace;
     font-size:11.5px; color:#7A7F86; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
   }
 
-  /* scroll-to-top */
+  /* =========================================================
+     10. OVERLAYS: command palette, lightbox, toast, back-to-top
+     ========================================================= */
+  .overlay{
+    position:fixed; inset:0; background:rgba(10,12,14,0.6); z-index:200;
+    display:flex; align-items:flex-start; justify-content:center; padding-top:14vh;
+  }
+  .overlay[hidden]{display:none;}
+  .palette-box{
+    width:min(560px, 92vw); background:var(--paper); border:1px solid var(--line-strong);
+    box-shadow:0 20px 50px rgba(0,0,0,0.4); font-family:'IBM Plex Mono', monospace;
+  }
+  .palette-box input{
+    width:100%; padding:14px 16px; border:0; border-bottom:1px solid var(--line-strong);
+    background:transparent; color:var(--ink); font:inherit; font-size:14px; outline:0;
+  }
+  .palette-box ul{list-style:none; margin:0; padding:6px; max-height:320px; overflow-y:auto;}
+  .palette-box li{padding:8px 10px; font-size:13px; cursor:pointer; display:flex; justify-content:space-between; gap:12px;}
+  .palette-box li .hint{color:var(--ink-soft); font-size:11px;}
+  .palette-box li.sel{background:var(--copper); color:var(--paper);}
+  .palette-box li.sel .hint{color:var(--paper);}
+  .palette-foot{padding:8px 12px; border-top:1px solid var(--line); font-size:11px; color:var(--ink-soft);}
+  #lightbox{align-items:center; padding-top:0; cursor:zoom-out;}
+  #lightbox img{max-width:92vw; max-height:88vh; border:1px solid var(--line-strong); background:#000;}
+  .toast{
+    position:fixed; left:50%; bottom:26px; transform:translate(-50%, 20px);
+    background:var(--ink); color:var(--paper); font-family:'IBM Plex Mono', monospace; font-size:12.5px;
+    padding:8px 14px; opacity:0; pointer-events:none; z-index:300; transition:opacity 0.25s ease, transform 0.25s ease;
+  }
+  .toast.show{opacity:1; transform:translate(-50%, 0);}
   .totop{
     position:fixed; bottom:22px; right:22px;
     width:38px; height:38px;
@@ -579,7 +779,17 @@
     z-index:60;
   }
   .totop.show{opacity:1; pointer-events:auto;}
+  /* Easter egg: Konami code toggles a retro CRT look */
+  html.crt body{filter:contrast(1.08) saturate(0.8); }
+  html.crt .sheet{box-shadow:inset 0 0 120px rgba(0,0,0,0.25);}
+  html.crt body::after{
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:400;
+    background:repeating-linear-gradient(transparent 0 2px, rgba(0,0,0,0.08) 2px 3px);
+  }
 
+  /* =========================================================
+     11. RESPONSIVE (mobile menu, tighter padding)
+     ========================================================= */
   @media (max-width:720px){
     .burger{display:flex;}
     header.frame nav{
@@ -588,12 +798,14 @@
       border-bottom:1px solid var(--line-strong);
       flex-direction:column; align-items:flex-start;
       padding:14px 20px;
-      transform:translateY(-110%);
-      transition:transform 0.25s ease;
+      /* Closed: slid fully out of view AND hidden, so no edge peeks over the header */
+      transform:translateY(-130%);
+      visibility:hidden;
+      transition:transform 0.25s ease, visibility 0.25s ease;
     }
-    header.frame nav.open{transform:translateY(0);}
+    header.frame nav.open{transform:translateY(0); visibility:visible;}
     header.frame nav a{margin:8px 0;}
-    .theme-toggle{margin:8px 0 0;}
+    .theme-toggle, .theme-toggle:first-of-type{margin:8px 0 0;}
   }
   @media (max-width:600px){
     .hero{padding:44px 18px 28px;}
@@ -604,8 +816,18 @@
 </head>
 <body>
 
+<!-- Reading-progress bar (width is set by JS on scroll) -->
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<noscript>
+  <p style="padding:12px 18px; font-family:monospace;">This portfolio uses JavaScript for its interactive demos. The content below is still readable without it.</p>
+</noscript>
+
 <div class="sheet">
 
+  <!-- =====================================================
+       HEADER: brand, section links, command palette, theme toggle
+       ===================================================== -->
   <header class="frame">
     <span class="brand decode-text">SUDARSHAN V</span>
     <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
@@ -614,15 +836,20 @@
       <a href="#projects" data-nav>Projects</a>
       <a href="#experience" data-nav>Experience</a>
       <a href="#contact" data-nav>Contact</a>
+      <button class="theme-toggle" id="paletteBtn" title="Open command palette (Ctrl+K)"><kbd>Ctrl</kbd><kbd>K</kbd></button>
       <button class="theme-toggle" id="themeToggle"><span class="dot"></span><span id="themeLabel">Dark Mode</span></button>
     </nav>
   </header>
 
-  <!-- HERO -->
+  <!-- =====================================================
+       HERO: name, tagline, quick links, terminal, chip diagram
+       ===================================================== -->
   <section class="hero">
     <div class="part-no">DEVICE NO. SV-2027-ECE</div>
     <h1 class="name">SUDARSHAN&nbsp;V</h1>
     <div class="tagline">Electronics and Communication Engineering student with hands-on experience in digital hardware design, RF and antenna systems, embedded systems, and wireless communication.<span class="cursor-blink">_</span></div>
+
+    <!-- Quick contact links. The "Copy Email" button is wired up in the JS below -->
     <div class="contact-row">
       <span>Chennai, Tamil Nadu</span>
       <a href="mailto:sudarshan060617@gmail.com">sudarshan060617@gmail.com</a>
@@ -630,9 +857,28 @@
       <a href="tel:+919025876308">+91 90258 76308</a>
       <a href="https://linkedin.com/in/sudarshan-veera8" target="_blank" rel="noopener">linkedin.com/in/sudarshan-veera8</a>
       <a href="https://github.com/Sudarshan-veera" target="_blank" rel="noopener">github.com/Sudarshan-veera</a>
-      <a class="copy-btn" href="resume.pdf" download style="text-decoration:none;">Download Resume</a>
+      <!-- Resume is hosted on Google Drive (opens in a new tab) -->
+      <a class="copy-btn" href="https://drive.google.com/file/d/1qvv8MSny8AOLjq_RA7kGPKbyn1bnn3J1/view?usp=sharing" target="_blank" rel="noopener" style="text-decoration:none;">View Resume</a>
     </div>
 
+    <!-- At-a-glance numbers; they count up when scrolled into view -->
+    <div class="stats">
+      <div class="stat"><div class="num"><span class="count" data-to="4">0</span></div><div class="lbl">projects</div></div>
+      <div class="stat"><div class="num"><span class="count" data-to="186.3" data-dec="1">0</span> µW</div><div class="lbl">ASIC power @ nominal</div></div>
+      <div class="stat"><div class="num"><span class="count" data-to="3.892" data-dec="3">0</span> THz</div><div class="lbl">sensor resonance</div></div>
+      <div class="stat"><div class="num"><span class="count" data-to="6">0</span></div><div class="lbl">certifications</div></div>
+    </div>
+
+    <!-- Interactive mini terminal: type "help" -->
+    <div class="term" id="term" aria-label="Interactive terminal">
+      <div class="term-bar"><i></i><i></i><i></i><span>sv@portfolio: ~ — type <b>help</b></span></div>
+      <div class="term-body" id="termBody">
+        <div id="termLog"></div>
+        <div class="term-row"><span class="p" style="color:#E0A45C">$</span><input class="term-input" id="termInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Terminal input"></div>
+      </div>
+    </div>
+
+    <!-- Decorative scrolling waveform -->
     <div class="waveform" aria-hidden="true">
       <svg viewBox="0 0 600 40" preserveAspectRatio="none">
         <polyline class="wave-line" fill="none" stroke="currentColor" stroke-width="1.5"
@@ -640,6 +886,7 @@
       </svg>
     </div>
 
+    <!-- Chip-style diagram: photo in the middle, section links as "pins" -->
     <div class="pinout">
       <div class="pins-wrap">
         <div class="pin-col">
@@ -650,7 +897,7 @@
         </div>
         <div class="chip">
           <div class="pin1"></div>
-          <img src="images/profile.jpg" alt="Sudarshan V" loading="lazy">
+          <img id="avatar" src="images/profile.jpg" alt="Sudarshan V (click to enlarge)" loading="lazy" tabindex="0">
           <div class="cap">
             <div class="id">SV-CORE</div>
             <div class="role">Hardware &amp;<br>Embedded Systems</div>
@@ -660,21 +907,25 @@
           <a class="pin" href="#achievements"><span class="pin-line"></span><span class="pin-label-right">ACHIEVEMENTS</span></a>
           <a class="pin" href="#languages"><span class="pin-line"></span><span class="pin-label-right">LANGUAGES</span></a>
           <a class="pin" href="#contact"><span class="pin-line"></span><span class="pin-label-right">CONTACT</span></a>
-          <a class="pin" href="https://github.com/Sudarshan-veera" target="_blank"><span class="pin-line"></span><span class="pin-label-right">GITHUB</span></a>
+          <a class="pin" href="https://github.com/Sudarshan-veera" target="_blank" rel="noopener"><span class="pin-line"></span><span class="pin-label-right">GITHUB</span></a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- OBJECTIVE -->
-  <section class="block objective reveal">
-    <div class="block-head"><span class="desig">§00</span><h2>Objective</h2></div>
+  <!-- =====================================================
+       00 — OBJECTIVE
+       ===================================================== -->
+  <section class="block objective reveal" id="objective">
+    <div class="block-head"><span class="desig">00</span><h2>Objective</h2></div>
     <p>Electronics and Communication Engineering student with hands-on experience in embedded systems, PCB design, RF and antenna engineering, digital hardware design, and wireless communication. Experienced in IP design and verification through a taped-out SKY130 ASIC, with proficiency in Verilog HDL and testbench-based verification. Committed to designing reliable hardware and software solutions through continuous learning and rigorous problem-solving.</p>
   </section>
 
-  <!-- EDUCATION -->
+  <!-- =====================================================
+       01 — EDUCATION
+       ===================================================== -->
   <section class="block reveal" id="education">
-    <div class="block-head"><span class="desig">§01</span><h2>Education</h2></div>
+    <div class="block-head"><span class="desig">01</span><h2>Education</h2></div>
     <div class="exp-item">
       <div class="when">2023 — 2027</div>
       <div>
@@ -691,17 +942,46 @@
     </div>
   </section>
 
-  <!-- SKILLS / BOM -->
+  <!-- =====================================================
+       02 — SKILLS
+       Each skill is a button. Clicking one highlights the projects that
+       list it in their data-skills attribute (see the project cards below).
+       ===================================================== -->
   <section class="block reveal" id="skills">
-    <div class="block-head"><span class="desig">§02</span><h2>Skills</h2></div>
+    <div class="block-head"><span class="desig">02</span><h2>Skills</h2></div>
+    <p class="skill-hint">Tip: click a skill to highlight the projects where it was used.</p>
     <table class="bom">
       <thead><tr><th>Category</th><th>Items</th></tr></thead>
       <tbody>
-        <tr><td class="cat">Languages</td><td>Python (NumPy, Pandas, Matplotlib, Seaborn), C, C++ (DSA)</td></tr>
-        <tr><td class="cat">Tools</td><td>MATLAB, Simulink, CST Studio Suite, GNU Radio, LTspice, Altium Designer, NS-3, Wireshark, Cisco Packet Tracer</td></tr>
-        <tr><td class="cat">Dev&nbsp;Tools</td><td>VS Code, PyCharm, GitHub, Arduino IDE, ESP-IDF, STM32CubeIDE, Docker, Linux</td></tr>
+        <tr><td class="cat">Languages</td><td>
+          <button class="skill-chip" data-skill="Python">Python</button><span style="color:var(--ink-soft)">(NumPy, Pandas, Matplotlib, Seaborn)</span>
+          <button class="skill-chip" data-skill="C">C</button>
+          <button class="skill-chip" data-skill="C++">C++ (DSA)</button>
+        </td></tr>
+        <tr><td class="cat">Tools</td><td>
+          <button class="skill-chip" data-skill="MATLAB">MATLAB</button>
+          <button class="skill-chip" data-skill="Simulink">Simulink</button>
+          <button class="skill-chip" data-skill="CST Studio Suite">CST Studio Suite</button>
+          <button class="skill-chip" data-skill="GNU Radio">GNU Radio</button>
+          <button class="skill-chip" data-skill="LTspice">LTspice</button>
+          <button class="skill-chip" data-skill="Altium Designer">Altium Designer</button>
+          <button class="skill-chip" data-skill="NS-3">NS-3</button>
+          <button class="skill-chip" data-skill="Wireshark">Wireshark</button>
+          <button class="skill-chip" data-skill="Cisco Packet Tracer">Cisco Packet Tracer</button>
+        </td></tr>
+        <tr><td class="cat">Dev&nbsp;Tools</td><td>
+          <button class="skill-chip" data-skill="VS Code">VS Code</button>
+          <button class="skill-chip" data-skill="PyCharm">PyCharm</button>
+          <button class="skill-chip" data-skill="GitHub">GitHub</button>
+          <button class="skill-chip" data-skill="Arduino IDE">Arduino IDE</button>
+          <button class="skill-chip" data-skill="ESP-IDF">ESP-IDF</button>
+          <button class="skill-chip" data-skill="STM32CubeIDE">STM32CubeIDE</button>
+          <button class="skill-chip" data-skill="Docker">Docker</button>
+          <button class="skill-chip" data-skill="Linux">Linux</button>
+        </td></tr>
       </tbody>
     </table>
+    <div class="skill-status" id="skillStatus" aria-live="polite"></div>
     <div class="cert-list">
       <h3>Certifications</h3>
       <div class="cert-tags">
@@ -715,10 +995,13 @@
     </div>
   </section>
 
-  <!-- EXPERIENCE -->
+  <!-- =====================================================
+       03 — EXPERIENCE
+       Includes an interactive NGAP byte explorer.
+       ===================================================== -->
   <section class="block reveal" id="experience">
-    <div class="block-head"><span class="desig">§03</span><h2>Internship</h2></div>
-    <div class="exp-item">
+    <div class="block-head"><span class="desig">03</span><h2>Internship</h2></div>
+    <div class="exp-item" data-skills="Python|Wireshark">
       <div class="when">2026</div>
       <div>
         <h3>BaSig Wireless</h3>
@@ -726,29 +1009,64 @@
           <li>Engineered Layer 2/3 protocols for 5G core signaling — NGAP (3GPP TS 38.413) and NAS (3GPP TS 24.501) message codecs in Python with hardcoded APER encoding validation.</li>
           <li>Achieved malformation-free transmission and bit-exact protocol compliance through empirical APER encoding analysis and Wireshark-based debugging.</li>
         </ul>
+        <div class="btn-row"><button class="ds-more-btn demo-btn" data-demo-toggle="ngap" aria-expanded="false">▶ Byte explorer</button></div>
+
+        <!-- Demo: NGAP byte explorer (bytes + field notes are defined in the JS) -->
+        <div class="demo" id="demo-ngap" hidden>
+          <div class="demo-title">Interactive: anatomy of an NGAP message</div>
+          <span class="demo-note">Simplified teaching sample, hand-annotated. It is not a capture of a real PDU. Hover or click a byte.</span>
+          <div class="bytes" id="bytes" role="list"></div>
+          <div class="field-box" id="fieldBox" aria-live="polite">Select a byte to see which field it belongs to.</div>
+          <div class="demo-controls">
+            <button class="mini-btn" id="ngapLen">Corrupt length byte</button>
+            <button class="mini-btn" id="ngapTrunc">Truncate 1 byte</button>
+            <button class="mini-btn" id="ngapReset">Reset</button>
+          </div>
+          <div class="verdict ok" id="ngapVerdict"></div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- PROJECTS -->
+  <!-- =====================================================
+       04 — PROJECTS
+       Each card has:
+         data-tags   : used by the filter buttons (rf / asic / embedded / networking)
+         data-skills : used by the skill chips above ("|" separated)
+       ===================================================== -->
   <section class="block reveal" id="projects">
-    <div class="block-head"><span class="desig">§04</span><h2>Academic Projects</h2></div>
+    <div class="block-head"><span class="desig">04</span><h2>Academic Projects</h2></div>
 
-    <div class="datasheet-card">
+    <!-- Tag filter -->
+    <div class="filter-row" id="filterRow">
+      <button class="chip-btn on" data-filter="all">All</button>
+      <button class="chip-btn" data-filter="asic">ASIC</button>
+      <button class="chip-btn" data-filter="rf">RF</button>
+      <button class="chip-btn" data-filter="embedded">Embedded</button>
+      <button class="chip-btn" data-filter="networking">Networking</button>
+      <span class="count-note" id="filterCount"></span>
+    </div>
+
+    <!-- Project 1: THz metamaterial sensor -->
+    <div class="datasheet-card" id="project-thz" data-tags="rf" data-skills="CST Studio Suite">
       <div class="ds-head">
         <span class="title">THz Metamaterial Sensor for Refractive Index Analysis</span>
         <span class="year">2025</span>
       </div>
       <div class="ds-body">
         <p style="margin:0 0 4px; color:var(--ink-soft); font-size:14.5px;">A GaAs–Al–polyimide terahertz metamaterial sensor, engineered and simulated for high-sensitivity refractive index detection.</p>
+        <div class="tag-row"><span class="tag">RF</span><span class="tag">Simulation</span></div>
         <div class="spec-grid">
           <div><span class="k">Resonant frequency</span><span class="v">3.892 THz</span></div>
           <div><span class="k">Simulation platform</span><span class="v">CST Studio Suite</span></div>
           <div><span class="k">Structure</span><span class="v">GaAs – Al – polyimide</span></div>
           <div><span class="k">Performance</span><span class="v">High-Q resonant absorption</span></div>
         </div>
-        <button class="ds-more-btn" data-toggle>View Details +</button>
-        <div class="ds-extra">
+        <div class="btn-row">
+          <button class="ds-more-btn" data-toggle="thz-details" aria-expanded="false">View Details +</button>
+          <button class="ds-more-btn demo-btn" data-demo-toggle="thz" aria-expanded="false">▶ Live demo</button>
+        </div>
+        <div class="ds-extra" id="thz-details">
           <div class="ds-extra-inner">
             <ul>
               <li>Engineered and simulated a GaAs–Al–polyimide THz metamaterial sensor operating at 3.892 THz.</li>
@@ -757,24 +1075,41 @@
             </ul>
           </div>
         </div>
+
+        <!-- Demo: resonance shift vs refractive index -->
+        <div class="demo" id="demo-thz" hidden>
+          <div class="demo-title">Interactive: resonance shift vs. refractive index</div>
+          <span class="demo-note">Illustrative model (Lorentzian peak, linear shift). Not exported CST data. Drag the slider, or click/drag on the plot to set a measured peak and read off n.</span>
+          <canvas id="thzCanvas" aria-label="Absorption spectrum that shifts with refractive index"></canvas>
+          <div class="demo-controls">
+            <label>Analyte index n <input type="range" id="thzN" min="1" max="1.6" step="0.005" value="1"><output id="thzNOut">1.000</output></label>
+            <label>Sensitivity S <input type="range" id="thzS" min="200" max="1000" step="10" value="600"><output id="thzSOut">600 GHz/RIU</output></label>
+          </div>
+          <div class="demo-readout" id="thzReadout"></div>
+        </div>
       </div>
     </div>
 
-    <div class="datasheet-card">
+    <!-- Project 2: TinyTapeout anomaly detector -->
+    <div class="datasheet-card" id="project-tt" data-tags="asic" data-skills="Python|Linux|GitHub">
       <div class="ds-head">
         <span class="title">TinyTapeout — Hardware Adaptive Anomaly Detector</span>
         <span class="year">2026</span>
       </div>
       <div class="ds-body">
         <p style="margin:0 0 4px; color:var(--ink-soft); font-size:14.5px;">SKY130 ASIC implementing a hardware sliding-window anomaly detector, submitted through the TinyTapeout open-source silicon program.</p>
+        <div class="tag-row"><span class="tag">ASIC</span><span class="tag">Verilog</span><span class="tag">SKY130</span></div>
         <div class="spec-grid">
           <div><span class="k">Sensitivity levels</span><span class="v">4 (50% → 6.25%)</span></div>
           <div><span class="k">Power @ nominal corner</span><span class="v">186.3 µW</span></div>
           <div><span class="k">Cell utilization</span><span class="v">503 / 1000 (50.3%)</span></div>
           <div><span class="k">Tile limit</span><span class="v">80% max</span></div>
         </div>
-        <button class="ds-more-btn" data-toggle>View Details +</button>
-        <div class="ds-extra">
+        <div class="btn-row">
+          <button class="ds-more-btn" data-toggle="tt-details" aria-expanded="false">View Details +</button>
+          <button class="ds-more-btn demo-btn" data-demo-toggle="anom" aria-expanded="false">▶ Live demo</button>
+        </div>
+        <div class="ds-extra" id="tt-details">
           <div class="ds-extra-inner">
             <ul>
               <li>Designed an adaptive-sensitivity threshold detector with stream/hold window modes and one-shot/N-shot alerting.</li>
@@ -783,24 +1118,47 @@
             </ul>
           </div>
         </div>
+
+        <!-- Demo: behavioural model of the detector -->
+        <div class="demo" id="demo-anom" hidden>
+          <div class="demo-title">Interactive: sliding-window anomaly detector</div>
+          <span class="demo-note">Behavioural model of the idea (moving average, threshold = average ÷ 2^k), not the RTL itself. The "hold" mode here pauses window updates for at most 8 samples.</span>
+          <canvas id="anCanvas" aria-label="Streaming signal with moving average and anomaly flags"></canvas>
+          <div class="demo-controls">
+            <label>Window <input type="range" id="anW" min="0" max="3" step="1" value="1"><output id="anWOut">8</output></label>
+            <label>Sensitivity <input type="range" id="anK" min="1" max="4" step="1" value="2"><output id="anKOut">25%</output></label>
+          </div>
+          <div class="demo-controls">
+            <span class="seg" role="group" aria-label="Window mode"><button class="on" data-anmode="stream">stream</button><button data-anmode="hold">hold</button></span>
+            <span class="seg" role="group" aria-label="Alert mode"><button class="on" data-analert="one">one-shot</button><button data-analert="n">N-shot (3)</button></span>
+            <button class="mini-btn" id="anSpike">Inject spike</button>
+            <button class="mini-btn" id="anPause">Pause</button>
+          </div>
+          <div class="demo-readout"><span class="led" id="anLed"></span><span id="anStat"></span></div>
+        </div>
         <a class="ds-link" href="https://github.com/Sudarshan-veera/TT_proj" target="_blank" rel="noopener">→ View repository</a>
       </div>
     </div>
 
-    <div class="datasheet-card">
+    <!-- Project 3: LoRa campus chat -->
+    <div class="datasheet-card" id="project-lora" data-tags="networking rf" data-skills="NS-3|Simulink|Linux">
       <div class="ds-head">
         <span class="title">LoRa-Based Campus Chat System Using Token Passing<span class="rf-icon" style="transform:translateY(2px) scale(0.85);"><i class="dot"></i><i class="wave wave1"></i><i class="wave wave2"></i></span></span>
         <span class="year">2026</span>
       </div>
       <div class="ds-body">
         <p style="margin:0 0 4px; color:var(--ink-soft); font-size:14.5px;">Low-power, long-range communication between distributed nodes using a token-passing algorithm.</p>
+        <div class="tag-row"><span class="tag">Networking</span><span class="tag">RF</span><span class="tag">LoRa</span></div>
         <div class="spec-grid">
           <div><span class="k">Transmit window</span><span class="v">5 s per node, collision-free</span></div>
           <div><span class="k">Simulation</span><span class="v">NS-3, Ninja build</span></div>
           <div><span class="k">Modulation analysis</span><span class="v">Simulink</span></div>
         </div>
-        <button class="ds-more-btn" data-toggle>View Details +</button>
-        <div class="ds-extra">
+        <div class="btn-row">
+          <button class="ds-more-btn" data-toggle="lora-details" aria-expanded="false">View Details +</button>
+          <button class="ds-more-btn demo-btn" data-demo-toggle="ring" aria-expanded="false">▶ Live demo</button>
+        </div>
+        <div class="ds-extra" id="lora-details">
           <div class="ds-extra-inner">
             <ul>
               <li>Validated network behavior in NS-3 using a Ninja build system and Bash scripts for environment configuration.</li>
@@ -808,24 +1166,44 @@
             </ul>
           </div>
         </div>
+
+        <!-- Demo: token ring with a 5 s transmit window per node -->
+        <div class="demo" id="demo-ring" hidden>
+          <div class="demo-title">Interactive: token passing, one talker at a time</div>
+          <span class="demo-note">Simulation with a 5 s window per node (sped up by the slider). Click a node to queue a message. Only the token holder may transmit.</span>
+          <svg class="ring-svg" id="ringSvg" viewBox="0 0 400 260" role="img" aria-label="Six nodes in a ring passing a token"></svg>
+          <div class="demo-controls">
+            <label>Speed <input type="range" id="ringSpeed" min="1" max="20" step="1" value="5"><output id="ringSpeedOut">5×</output></label>
+            <button class="mini-btn" id="ringQueue">Queue message</button>
+            <button class="mini-btn" id="ringCollide">Try to transmit without token</button>
+            <span class="seg" role="group" aria-label="Auto traffic"><button id="ringAuto">auto traffic: off</button></span>
+            <button class="mini-btn" id="ringReset">Reset</button>
+          </div>
+          <div class="demo-readout" id="ringStat"></div>
+        </div>
         <a class="ds-link" href="https://github.com/Sudarshan-veera/LoRA-WAN_CampusChat" target="_blank" rel="noopener">→ View repository</a>
       </div>
     </div>
 
-    <div class="datasheet-card">
+    <!-- Project 4: ANGEL BOT -->
+    <div class="datasheet-card" id="project-angel" data-tags="embedded" data-skills="Arduino IDE|C++">
       <div class="ds-head">
         <span class="title">ANGEL BOT — IoT-Based Disaster Rescue Robot</span>
         <span class="year">2025</span>
       </div>
       <div class="ds-body">
         <p style="margin:0 0 4px; color:var(--ink-soft); font-size:14.5px;">ESP32-based rescue robot for hazardous-zone navigation with continuous environmental monitoring.</p>
+        <div class="tag-row"><span class="tag">Embedded</span><span class="tag">IoT</span><span class="tag">ESP32</span></div>
         <div class="spec-grid">
           <div><span class="k">Video</span><span class="v">ESP32-CAM, real-time stream</span></div>
           <div><span class="k">Audio</span><span class="v">INMP441 MEMS mic, I2S</span></div>
           <div><span class="k">Sensing</span><span class="v">MQ-series gas sensors</span></div>
         </div>
-        <button class="ds-more-btn" data-toggle>View Details +</button>
-        <div class="ds-extra">
+        <div class="btn-row">
+          <button class="ds-more-btn" data-toggle="angel-details" aria-expanded="false">View Details +</button>
+          <button class="ds-more-btn demo-btn" data-demo-toggle="bot" aria-expanded="false">▶ Live demo</button>
+        </div>
+        <div class="ds-extra" id="angel-details">
           <div class="ds-extra-inner">
             <ul>
               <li>Combined wireless remote control with live sensor telemetry for hazardous gas detection in the field.</li>
@@ -833,14 +1211,39 @@
             </ul>
           </div>
         </div>
+
+        <!-- Demo: simulated rescue-robot dashboard -->
+        <div class="demo" id="demo-bot" hidden>
+          <div class="demo-title">Interactive: drive the robot, find the gas leak</div>
+          <span class="demo-note">Simulated telemetry. Click the map, then use the arrow keys or WASD, or use the pad. Gas rises near the hidden hazard zone.</span>
+          <div class="bot-grid">
+            <canvas id="botMap" tabindex="0" aria-label="Map of the rescue area. Use arrow keys to drive."></canvas>
+            <div>
+              <div class="demo-readout" style="margin-top:0">MQ gas sensor: <b id="gasVal">0</b> ppm <span class="alert-tag" id="botAlert">⚠ GAS ALERT</span></div>
+              <div class="gauge" id="gasGauge"><i></i><b id="gasMark"></b></div>
+              <label class="demo-controls" style="margin:4px 0;"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft)">Alarm threshold</span> <input type="range" id="gasThr" min="150" max="800" step="10" value="400"><output id="gasThrOut" style="font-family:'IBM Plex Mono',monospace;font-size:12px">400</output></label>
+              <div class="demo-readout" style="margin-top:6px">I2S mic level (simulated)</div>
+              <div class="mic" id="mic"></div>
+              <div class="dpad" aria-label="Drive pad">
+                <button class="up" data-dir="up" aria-label="Forward">▲</button>
+                <button data-dir="left" aria-label="Left" style="grid-row:2;grid-column:1">◀</button>
+                <button data-dir="down" aria-label="Back" style="grid-row:2;grid-column:2">▼</button>
+                <button data-dir="right" aria-label="Right" style="grid-row:2;grid-column:3">▶</button>
+              </div>
+              <div class="botlog" id="botLog"></div>
+            </div>
+          </div>
+        </div>
         <a class="ds-link" href="https://github.com/Sudarshan-veera/Angel-bot" target="_blank" rel="noopener">→ View repository</a>
       </div>
     </div>
   </section>
 
-  <!-- NOTES -->
+  <!-- =====================================================
+       04.1 — NOTES
+       ===================================================== -->
   <section class="block reveal" id="notes">
-    <div class="block-head"><span class="desig">§04.1</span><h2>Notes</h2></div>
+    <div class="block-head"><span class="desig">04.1</span><h2>Notes</h2></div>
     <div class="exp-item" style="grid-template-columns:1fr;">
       <div>
         <h3>Taping out a SKY130 ASIC as a student</h3>
@@ -849,9 +1252,11 @@
     </div>
   </section>
 
-  <!-- ACHIEVEMENTS -->
+  <!-- =====================================================
+       05 — ACHIEVEMENTS
+       ===================================================== -->
   <section class="block reveal" id="achievements">
-    <div class="block-head"><span class="desig">§05</span><h2>Achievements &amp; Leadership</h2></div>
+    <div class="block-head"><span class="desig">05</span><h2>Achievements &amp; Leadership</h2></div>
     <div class="ach-grid">
       <div class="ach-cell"><div class="role">Head of Design — Quizzers Anonymous Club, 2025–26</div><p>Led a 6-member design team for weekly quiz events.</p></div>
       <div class="ach-cell"><div class="role">Design Head — Student Quality Council, 2025–26</div><p>Directed design for institutional quality events.</p></div>
@@ -861,9 +1266,11 @@
     </div>
   </section>
 
-  <!-- LANGUAGES -->
+  <!-- =====================================================
+       06 — LANGUAGES
+       ===================================================== -->
   <section class="block reveal" id="languages">
-    <div class="block-head"><span class="desig">§06</span><h2>Languages</h2></div>
+    <div class="block-head"><span class="desig">06</span><h2>Languages</h2></div>
     <div class="lang-row">
       <div>Tamil <span class="lvl">— Native</span></div>
       <div>English <span class="lvl">— Fluent</span></div>
@@ -872,20 +1279,30 @@
     </div>
   </section>
 
-  <!-- CONTACT -->
+  <!-- =====================================================
+       07 — CONTACT
+       The form posts to Web3Forms (free, no backend needed) from JS.
+       Put your access key in WEB3FORMS_KEY in the script below.
+       If it is still the placeholder, the form falls back to opening
+       the visitor's email app with the message pre-filled.
+       ===================================================== -->
   <footer class="frame" id="contact">
-    <span class="desig">§07</span>
+    <span class="desig">07</span>
     <h2>Contact<span class="rf-icon" aria-hidden="true"><i class="dot"></i><i class="wave wave1"></i><i class="wave wave2"></i></span></h2>
     <p style="max-width:520px; color:#B6BAC0;">Open to Hardware Engineering internship opportunities and collaborations in ASIC design and verification, RF and antenna engineering, and embedded systems.</p>
 
-    <form class="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+    <form class="contact-form" id="contactForm" novalidate>
+      <!-- Honeypot: real visitors never see or fill this; bots often do -->
+      <input type="text" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="form-row">
-        <input type="text" name="name" placeholder="Name" required>
-        <input type="email" name="email" placeholder="Email" required>
+        <input type="text" name="name" placeholder="Name" required aria-label="Your name" autocomplete="name">
+        <input type="email" name="email" placeholder="Email" required aria-label="Your email" autocomplete="email">
       </div>
-      <textarea name="message" rows="4" placeholder="Message" required></textarea>
-      <button type="submit" class="form-submit">Send Message</button>
+      <textarea name="message" rows="4" placeholder="Message" required aria-label="Your message"></textarea>
+      <button type="submit" class="form-submit" id="formBtn">Send Message</button>
+      <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
     </form>
+
     <div class="contact-grid">
       <div><span class="k">EMAIL</span><a href="mailto:sudarshan060617@gmail.com">sudarshan060617@gmail.com</a></div>
       <div><span class="k">PHONE</span><a href="tel:+919025876308">+91 90258 76308</a></div>
@@ -895,93 +1312,1029 @@
     </div>
     <div class="bottom-line">
       <span>SUDARSHAN V — REV 2026</span>
-      <span>END OF DOCUMENT</span>
+      <span>Press <kbd>Ctrl</kbd> <kbd>K</kbd> for commands · <kbd>T</kbd> toggles theme</span>
     </div>
   </footer>
 
 </div>
 
+<!-- Back-to-top button (shown after scrolling down) -->
 <button class="totop" id="totop" aria-label="Back to top">↑</button>
 
+<!-- Command palette (Ctrl+K or "/") -->
+<div class="overlay" id="palette" hidden role="dialog" aria-modal="true" aria-label="Command palette">
+  <div class="palette-box">
+    <input id="paletteInput" type="text" placeholder="Jump to a section, open a demo, run a command..." autocomplete="off" spellcheck="false">
+    <ul id="paletteList" role="listbox"></ul>
+    <div class="palette-foot">↑↓ navigate · Enter run · Esc close</div>
+  </div>
+</div>
+
+<!-- Photo lightbox (click the chip photo) -->
+<div class="overlay" id="lightbox" hidden role="dialog" aria-label="Photo"><img alt="Sudarshan V" id="lightboxImg"></div>
+
+<!-- Small message that pops up at the bottom (copy confirmations, etc.) -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <script>
-  // ----- Theme toggle -----
-  const root = document.documentElement;
-  const themeToggle = document.getElementById('themeToggle');
-  const themeLabel = document.getElementById('themeLabel');
-  function setTheme(t){
-    root.setAttribute('data-theme', t);
-    themeLabel.textContent = t === 'dark' ? 'Light Mode' : 'Dark Mode';
-    localStorage.setItem('sv-theme', t);
+/* ==========================================================================
+   SCRIPT OVERVIEW
+   A. Helpers            : tiny utilities used everywhere
+   B. Core page behavior : theme, nav, scroll effects, counters, toggles
+   C. Projects UX        : tag filter + skill highlighting
+   D. Overlays           : toast, lightbox, command palette
+   E. Terminal           : the interactive terminal in the hero
+   F. Contact form       : Web3Forms with a mailto fallback
+   G. Demos              : THz sensor, anomaly detector, token ring,
+                           NGAP byte explorer, ANGEL BOT dashboard
+   H. Extras             : keyboard shortcuts, Konami code, console banner
+   ========================================================================== */
+(() => {
+'use strict';
+
+/* ---------- Settings you may want to change ---------- */
+// Get a free key at https://web3forms.com (it is emailed to you), then paste it here.
+const WEB3FORMS_KEY = 'PASTE_YOUR_KEY_HERE';
+const EMAIL = 'sudarshan060617@gmail.com';
+// Resume lives on Google Drive (make sure sharing is "Anyone with the link")
+const RESUME_URL = 'https://drive.google.com/file/d/1qvv8MSny8AOLjq_RA7kGPKbyn1bnn3J1/view?usp=sharing';
+
+/* ==========================================================================
+   A. HELPERS
+   ========================================================================== */
+const $  = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+// Read a CSS variable (used by the canvas demos so they follow the theme)
+const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// localStorage can throw (private mode, blocked cookies), so wrap it
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+  set(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
+};
+const rand = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+// Make a canvas crisp on high-DPI screens and return its 2D context + CSS size
+function setupCanvas(canvas){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const r = canvas.getBoundingClientRect();
+  const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height));
+  if(canvas.width !== w * dpr || canvas.height !== h * dpr){ canvas.width = w * dpr; canvas.height = h * dpr; }
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w, h };
+}
+
+// A requestAnimationFrame loop that can be started and stopped.
+// fn(dt, timestamp) gets the seconds since the previous frame (capped at 0.1).
+function makeLoop(fn){
+  let id = 0, last = 0, on = false;
+  function frame(ts){
+    if(!on) return;
+    const dt = Math.min(0.1, (ts - last) / 1000 || 0);
+    last = ts;
+    fn(dt, ts);
+    id = requestAnimationFrame(frame);
   }
-  const saved = localStorage.getItem('sv-theme');
-  if(saved){ setTheme(saved); }
-  themeToggle.addEventListener('click', () => {
-    const current = root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-    setTheme(current === 'dark' ? 'light' : 'dark');
+  return {
+    start(){ if(on) return; on = true; last = performance.now(); id = requestAnimationFrame(frame); },
+    stop(){ on = false; cancelAnimationFrame(id); }
+  };
+}
+
+/* ==========================================================================
+   B. CORE PAGE BEHAVIOR
+   ========================================================================== */
+
+/* ----- Theme toggle (remembers the choice) ----- */
+const root = document.documentElement;
+const themeLabel = $('#themeLabel');
+const themeListeners = [];            // demos register here to redraw on theme change
+function setTheme(t){
+  root.setAttribute('data-theme', t);
+  themeLabel.textContent = t === 'dark' ? 'Light Mode' : 'Dark Mode';
+  store.set('sv-theme', t);
+  themeListeners.forEach(fn => fn());
+}
+function toggleTheme(){
+  setTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+const savedTheme = store.get('sv-theme');
+if(savedTheme) setTheme(savedTheme);
+$('#themeToggle').addEventListener('click', toggleTheme);
+
+/* ----- Mobile menu ----- */
+const nav = $('#nav');
+$('#burger').addEventListener('click', () => nav.classList.toggle('open'));
+$$('#nav a').forEach(a => a.addEventListener('click', () => nav.classList.remove('open')));
+
+/* ----- Scroll-spy: highlight the nav link of the section in view ----- */
+const navLinks = $$('a[data-nav]');
+const spyObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      navLinks.forEach(l => l.classList.remove('active'));
+      const match = $('a[data-nav][href="#' + entry.target.id + '"]');
+      if(match) match.classList.add('active');
+    }
   });
+}, { rootMargin: '-40% 0px -50% 0px' });
+['skills','projects','experience','contact'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) spyObserver.observe(el);
+});
 
-  // ----- Mobile menu -----
-  const burger = document.getElementById('burger');
-  const nav = document.getElementById('nav');
-  burger.addEventListener('click', () => nav.classList.toggle('open'));
-  document.querySelectorAll('#nav a').forEach(a => a.addEventListener('click', () => nav.classList.remove('open')));
+/* ----- Reveal sections once as they scroll into view ----- */
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){ entry.target.classList.add('in'); revealObserver.unobserve(entry.target); }
+  });
+}, { threshold: 0.12 });
+$$('.reveal').forEach(el => revealObserver.observe(el));
 
-  // ----- Scroll-spy active nav -----
-  const navLinks = document.querySelectorAll('a[data-nav]');
-  const sections = ['skills','projects','experience','contact'].map(id => document.getElementById(id));
-  const spyObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if(entry.isIntersecting){
-        navLinks.forEach(l => l.classList.remove('active'));
-        const match = document.querySelector('a[href="#' + entry.target.id + '"]');
-        if(match) match.classList.add('active');
+/* ----- Scroll progress bar + back-to-top button ----- */
+const progress = $('#progress');
+const totop = $('#totop');
+function onScroll(){
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  progress.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
+  totop.classList.toggle('show', window.scrollY > 600);
+}
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+totop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }));
+
+/* ----- Copy-to-clipboard buttons ----- */
+async function copyText(text){
+  try { await navigator.clipboard.writeText(text); return true; } catch(e){ return false; }
+}
+$$('[data-copy]').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const ok = await copyText(btn.getAttribute('data-copy'));
+    if(!ok) return;
+    const original = btn.textContent;
+    btn.textContent = 'Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1600);
+  });
+});
+
+/* ----- Count-up numbers in the hero stats ----- */
+const statsEl = $('.stats');
+if(statsEl){
+  const countObserver = new IntersectionObserver(entries => {
+    if(!entries[0].isIntersecting) return;
+    countObserver.disconnect();
+    $$('.count', statsEl).forEach(el => {
+      const to = parseFloat(el.dataset.to), dec = parseInt(el.dataset.dec || '0', 10);
+      if(reduceMotion){ el.textContent = to.toFixed(dec); return; }
+      const t0 = performance.now(), dur = 1100;
+      (function tick(now){
+        const p = clamp((now - t0) / dur, 0, 1);
+        el.textContent = (to * (1 - Math.pow(1 - p, 3))).toFixed(dec);   // ease-out
+        if(p < 1) requestAnimationFrame(tick);
+      })(t0);
+    });
+  }, { threshold: 0.4 });
+  countObserver.observe(statsEl);
+}
+
+/* ----- "View Details" panels (height animates via CSS) ----- */
+$$('[data-toggle]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const panel = document.getElementById(btn.dataset.toggle);
+    const open = panel.classList.toggle('open');
+    btn.textContent = open ? 'Hide Details −' : 'View Details +';
+    btn.setAttribute('aria-expanded', String(open));
+  });
+});
+
+/* ----- Live-demo panels -----
+   Each demo registers itself in `demos` as { init, start, stop, redraw }.
+   init() runs once on first open; start()/stop() run the animation loop only
+   while the panel is open, so closed demos cost nothing. */
+const demos = {};
+$$('[data-demo-toggle]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const name = btn.dataset.demoToggle;
+    const panel = document.getElementById('demo-' + name);
+    const d = demos[name];
+    const open = panel.hidden;               // currently hidden -> about to open
+    panel.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+    btn.textContent = open ? '■ Close demo' : (name === 'ngap' ? '▶ Byte explorer' : '▶ Live demo');
+    if(!d) return;
+    if(open){
+      if(!d.ready){ d.init(); d.ready = true; }
+      d.redraw && d.redraw();
+      d.start && d.start();
+    } else {
+      d.stop && d.stop();
+    }
+  });
+});
+// Redraw open demos when the window resizes or the theme changes
+function redrawDemos(){ Object.values(demos).forEach(d => d.ready && d.redraw && d.redraw()); }
+window.addEventListener('resize', redrawDemos);
+themeListeners.push(redrawDemos);
+// Pause everything if the tab is hidden (saves battery)
+document.addEventListener('visibilitychange', () => {
+  Object.entries(demos).forEach(([name, d]) => {
+    const panel = document.getElementById('demo-' + name);
+    if(!d.ready || panel.hidden) return;
+    document.hidden ? d.stop && d.stop() : d.start && d.start();
+  });
+});
+
+// Smoothly scroll to a selector (used by the terminal and palette)
+function goTo(sel){
+  const el = $(sel);
+  if(el) el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+}
+// Open a demo by name and scroll to it
+function openDemo(name){
+  setFilter('all');
+  const btn = $('[data-demo-toggle="' + name + '"]');
+  if(!btn) return false;
+  if(btn.getAttribute('aria-expanded') !== 'true') btn.click();
+  const host = btn.closest('.datasheet-card, .exp-item');
+  setTimeout(() => host && host.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }), 50);
+  return true;
+}
+
+/* ==========================================================================
+   C. PROJECTS UX: TAG FILTER + SKILL HIGHLIGHTING
+   ========================================================================== */
+const cards = $$('.datasheet-card');
+const filterCount = $('#filterCount');
+function setFilter(tag){
+  $$('#filterRow [data-filter]').forEach(b => b.classList.toggle('on', b.dataset.filter === tag));
+  let shown = 0;
+  cards.forEach(card => {
+    const match = tag === 'all' || card.dataset.tags.split(' ').includes(tag);
+    card.classList.toggle('is-hidden', !match);
+    if(match) shown++;
+  });
+  filterCount.textContent = 'showing ' + shown + ' of ' + cards.length;
+}
+$$('#filterRow [data-filter]').forEach(b => b.addEventListener('click', () => setFilter(b.dataset.filter)));
+setFilter('all');
+
+// Skill chips: highlight every element whose data-skills includes the clicked skill
+const skillStatus = $('#skillStatus');
+const skillTargets = $$('[data-skills]');
+let activeSkill = null;
+// Mark chips that at least one project uses with a copper border
+$$('.skill-chip').forEach(chip => {
+  const used = skillTargets.some(t => t.dataset.skills.split('|').includes(chip.dataset.skill));
+  chip.classList.toggle('has', used);
+});
+function setSkill(skill){
+  activeSkill = (activeSkill === skill) ? null : skill;
+  $$('.skill-chip').forEach(c => c.classList.toggle('on', c.dataset.skill === activeSkill));
+  let hits = 0;
+  skillTargets.forEach(t => {
+    const uses = activeSkill && t.dataset.skills.split('|').includes(activeSkill);
+    t.classList.toggle('skill-hit', !!uses && t.classList.contains('datasheet-card'));
+    t.classList.toggle('skill-dim', !!activeSkill && !uses);
+    if(uses) hits++;
+  });
+  skillStatus.textContent = !activeSkill ? '' :
+    hits ? activeSkill + ' → used in ' + hits + ' place' + (hits > 1 ? 's' : '') + ' (highlighted below). Click again to clear.'
+         : activeSkill + ' → not tied to a listed project yet. Click again to clear.';
+  if(activeSkill && hits) setFilter('all');
+}
+$$('.skill-chip').forEach(c => c.addEventListener('click', () => setSkill(c.dataset.skill)));
+
+/* ==========================================================================
+   D. OVERLAYS: TOAST, LIGHTBOX, COMMAND PALETTE
+   ========================================================================== */
+const toastEl = $('#toast');
+let toastTimer;
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+}
+
+/* ----- Lightbox: click the photo to enlarge ----- */
+const lightbox = $('#lightbox');
+function openLightbox(){ $('#lightboxImg').src = $('#avatar').src; lightbox.hidden = false; }
+$('#avatar').addEventListener('click', openLightbox);
+$('#avatar').addEventListener('keydown', e => { if(e.key === 'Enter') openLightbox(); });
+lightbox.addEventListener('click', () => { lightbox.hidden = true; });
+
+/* ----- Command palette ----- */
+const palette = $('#palette'), pInput = $('#paletteInput'), pList = $('#paletteList');
+const copyEmail = async () => { toast(await copyText(EMAIL) ? 'Email copied' : 'Copy failed'); };
+const paletteItems = [
+  ...[['Education','#education'],['Skills','#skills'],['Internship','#experience'],['Projects','#projects'],
+      ['Notes','#notes'],['Achievements','#achievements'],['Languages','#languages'],['Contact','#contact']]
+    .map(([label, id]) => ({ label: 'Go to ' + label, hint: 'section', run: () => goTo(id) })),
+  { label: 'Open demo: THz sensor',         hint: 'demo', run: () => openDemo('thz') },
+  { label: 'Open demo: Anomaly detector',   hint: 'demo', run: () => openDemo('anom') },
+  { label: 'Open demo: LoRa token ring',    hint: 'demo', run: () => openDemo('ring') },
+  { label: 'Open demo: ANGEL BOT dashboard',hint: 'demo', run: () => openDemo('bot') },
+  { label: 'Open demo: NGAP byte explorer', hint: 'demo', run: () => openDemo('ngap') },
+  { label: 'Toggle light / dark theme',     hint: 'T',    run: toggleTheme },
+  { label: 'Copy email address',            hint: 'action', run: copyEmail },
+  { label: 'Open GitHub profile',           hint: 'link', run: () => window.open('https://github.com/Sudarshan-veera', '_blank', 'noopener') },
+  { label: 'Open LinkedIn profile',         hint: 'link', run: () => window.open('https://linkedin.com/in/sudarshan-veera8', '_blank', 'noopener') },
+  { label: 'View resume',                   hint: 'file', run: () => window.open(RESUME_URL, '_blank', 'noopener') },
+  { label: 'Focus the terminal',            hint: 'action', run: () => { goTo('.term'); setTimeout(() => $('#termInput').focus({ preventScroll: true }), 400); } }
+];
+let pFiltered = [], pSel = 0;
+function renderPalette(){
+  const q = pInput.value.toLowerCase().split(/\s+/).filter(Boolean);
+  pFiltered = paletteItems.filter(it => q.every(w => (it.label + ' ' + it.hint).toLowerCase().includes(w)));
+  pSel = clamp(pSel, 0, Math.max(0, pFiltered.length - 1));
+  pList.innerHTML = '';
+  pFiltered.forEach((it, i) => {
+    const li = document.createElement('li');
+    li.setAttribute('role', 'option');
+    li.className = i === pSel ? 'sel' : '';
+    li.innerHTML = '<span></span><span class="hint"></span>';
+    li.firstChild.textContent = it.label;
+    li.lastChild.textContent = it.hint;
+    li.addEventListener('click', () => runPalette(i));
+    pList.appendChild(li);
+  });
+  if(!pFiltered.length) pList.innerHTML = '<li style="cursor:default">No match</li>';
+}
+function openPalette(){ palette.hidden = false; pInput.value = ''; pSel = 0; renderPalette(); pInput.focus(); }
+function closePalette(){ palette.hidden = true; }
+function runPalette(i){ const it = pFiltered[i]; closePalette(); if(it) it.run(); }
+$('#paletteBtn').addEventListener('click', openPalette);
+palette.addEventListener('click', e => { if(e.target === palette) closePalette(); });
+pInput.addEventListener('input', () => { pSel = 0; renderPalette(); });
+pInput.addEventListener('keydown', e => {
+  if(e.key === 'ArrowDown'){ e.preventDefault(); pSel = Math.min(pSel + 1, pFiltered.length - 1); renderPalette(); }
+  else if(e.key === 'ArrowUp'){ e.preventDefault(); pSel = Math.max(pSel - 1, 0); renderPalette(); }
+  else if(e.key === 'Enter'){ e.preventDefault(); runPalette(pSel); }
+});
+
+/* ==========================================================================
+   E. TERMINAL
+   A fake shell. Type "help". Output is inserted with textContent, never as
+   HTML, so whatever a visitor types cannot inject markup.
+   ========================================================================== */
+const termLog = $('#termLog'), termInput = $('#termInput'), termBody = $('#termBody');
+const history = []; let histPos = 0;
+function print(text, cls){
+  const div = document.createElement('div');
+  div.className = 'term-line' + (cls ? ' ' + cls : '');
+  div.textContent = text;
+  termLog.appendChild(div);
+  termBody.scrollTop = termBody.scrollHeight;
+}
+function printCmd(line){
+  const div = document.createElement('div');
+  div.className = 'term-line';
+  const p = document.createElement('span'); p.className = 'p'; p.textContent = '$ ';
+  div.appendChild(p); div.appendChild(document.createTextNode(line));
+  termLog.appendChild(div);
+}
+const OPEN_TARGETS = {
+  thz: 'thz', tt: 'anom', tinytapeout: 'anom', anomaly: 'anom', lora: 'ring', ring: 'ring',
+  angel: 'bot', bot: 'bot', ngap: 'ngap', nas: 'ngap'
+};
+const FILES = {
+  'about.txt': 'ECE student at College of Engineering, Guindy (2023-2027).\nASIC design and verification, RF/antenna engineering, embedded systems.',
+  'focus.txt': 'ASIC design & verification  |  RF & antenna engineering  |  embedded systems  |  5G protocols',
+  'contact.txt': EMAIL + '\n+91 90258 76308\nChennai, Tamil Nadu, IN'
+};
+const COMMANDS = {
+  help(){ return [
+    'Commands:',
+    '  about            who I am',
+    '  skills           what I work with',
+    '  projects         list projects (then: open <name>)',
+    '  open <name>      thz | tt | lora | angel | ngap | contact',
+    '  experience       internship summary',
+    '  education        degree and school',
+    '  contact          ways to reach me',
+    '  github / linkedin   open profiles',
+    '  email            copy my email',
+    '  resume           open my resume',
+    '  theme [dark|light]  switch theme',
+    '  ls, cat <file>, date, echo, clear',
+    'Also: Ctrl+K opens the command palette.'].join('\n'); },
+  whoami(){ return 'sudarshan-v'; },
+  about(){ return FILES['about.txt']; },
+  skills(){ return 'Python, C, C++ | MATLAB, Simulink, CST, GNU Radio, LTspice, Altium, NS-3, Wireshark\nVS Code, GitHub, Arduino IDE, ESP-IDF, STM32CubeIDE, Docker, Linux'; },
+  projects(){ return [
+    '[thz]    THz Metamaterial Sensor (2025)',
+    '[tt]     TinyTapeout Anomaly Detector, SKY130 (2026)',
+    '[lora]   LoRa Campus Chat, token passing (2026)',
+    '[angel]  ANGEL BOT rescue robot (2025)',
+    'Try: open tt'].join('\n'); },
+  experience(){ return 'BaSig Wireless (2026): NGAP/NAS codecs for 5G core signaling in Python.\nTry: open ngap'; },
+  education(){ return 'B.E. ECE, College of Engineering, Guindy, 2023-2027 (CGPA 7.75 through 5th sem).\nHSC, JG Hindu Vidyalaya, 2023 (92%).'; },
+  contact(){ return FILES['contact.txt']; },
+  ls(){ return 'about.txt  focus.txt  contact.txt  projects/  (type "resume" to open my CV)'; },
+  cat(args){ const f = args[0]; return FILES[f] || (f ? 'cat: ' + f + ': No such file' : 'usage: cat <file>'); },
+  date(){ return new Date().toString(); },
+  echo(args){ return args.join(' '); },
+  clear(){ termLog.innerHTML = ''; return null; },
+  email(){ copyEmail(); return 'Email copied to clipboard: ' + EMAIL; },
+  github(){ window.open('https://github.com/Sudarshan-veera', '_blank', 'noopener'); return 'Opening github.com/Sudarshan-veera ...'; },
+  linkedin(){ window.open('https://linkedin.com/in/sudarshan-veera8', '_blank', 'noopener'); return 'Opening LinkedIn ...'; },
+  resume(){ window.open(RESUME_URL, '_blank', 'noopener'); return 'Opening resume ...'; },
+  theme(args){
+    const want = args[0];
+    if(want === 'dark' || want === 'light') setTheme(want); else toggleTheme();
+    return 'Theme: ' + root.getAttribute('data-theme'); },
+  open(args){
+    const t = (args[0] || '').toLowerCase();
+    if(t === 'contact'){ goTo('#contact'); return 'Scrolling to contact ...'; }
+    if(t === 'skills'){ goTo('#skills'); return 'Scrolling to skills ...'; }
+    if(OPEN_TARGETS[t]){ openDemo(OPEN_TARGETS[t]); return 'Opening demo: ' + t; }
+    return 'usage: open <thz|tt|lora|angel|ngap|contact|skills>'; },
+  sudo(){ return 'Nice try. This portfolio is read-only.'; }
+};
+function runCommand(line){
+  const trimmed = line.trim();
+  printCmd(line);
+  if(!trimmed) return;
+  history.push(trimmed); histPos = history.length;
+  const [cmd, ...args] = trimmed.split(/\s+/);
+  const fn = COMMANDS[cmd.toLowerCase()];
+  if(!fn){ print('command not found: ' + cmd + '  (type "help")', 'dim'); return; }
+  const out = fn(args);
+  if(out) print(out);
+}
+termBody.addEventListener('click', () => termInput.focus({ preventScroll: true }));
+termInput.addEventListener('keydown', e => {
+  userTouchedTerm = true;
+  if(e.key === 'Enter'){ const v = termInput.value; termInput.value = ''; runCommand(v); }
+  else if(e.key === 'ArrowUp'){ e.preventDefault(); if(histPos > 0){ histPos--; termInput.value = history[histPos]; } }
+  else if(e.key === 'ArrowDown'){ e.preventDefault(); if(histPos < history.length - 1){ histPos++; termInput.value = history[histPos]; } else { histPos = history.length; termInput.value = ''; } }
+  else if(e.key === 'Tab'){
+    e.preventDefault();
+    const hit = Object.keys(COMMANDS).filter(c => c.startsWith(termInput.value.toLowerCase()));
+    if(hit.length === 1) termInput.value = hit[0] + ' ';
+  }
+});
+// Boot sequence: type two commands automatically so visitors see what it does
+let userTouchedTerm = false;
+function bootTerminal(){
+  print('SV-OS 1.0  (type "help" to see commands)', 'dim');
+  const script = ['whoami', 'cat focus.txt'];
+  if(reduceMotion){ script.forEach(runCommand); return; }
+  let i = 0;
+  (function nextCmd(){
+    if(userTouchedTerm || i >= script.length) return;
+    const cmd = script[i++]; let k = 0;
+    (function typeChar(){
+      if(userTouchedTerm) return;
+      if(k <= cmd.length){ termInput.value = cmd.slice(0, k++); setTimeout(typeChar, 55); }
+      else { setTimeout(() => { if(userTouchedTerm) return; termInput.value = ''; runCommand(cmd); setTimeout(nextCmd, 500); }, 250); }
+    })();
+  })();
+}
+setTimeout(bootTerminal, 900);
+
+/* ==========================================================================
+   F. CONTACT FORM
+   Sends the message through Web3Forms. While WEB3FORMS_KEY is still the
+   placeholder, it opens the visitor's email app with the message filled in,
+   so the form is never a dead end.
+   ========================================================================== */
+const form = $('#contactForm'), formBtn = $('#formBtn'), formStatus = $('#formStatus');
+function setStatus(msg, cls){ formStatus.textContent = msg; formStatus.className = 'form-status' + (cls ? ' ' + cls : ''); }
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const fd = new FormData(form);
+  if(fd.get('botcheck')) return;                       // honeypot was filled: it is a bot
+  fd.delete('botcheck');
+  const name = String(fd.get('name') || '').trim();
+  const email = String(fd.get('email') || '').trim();
+  const message = String(fd.get('message') || '').trim();
+  if(!name || !message || !/^\S+@\S+\.\S+$/.test(email)){
+    setStatus('Please fill in your name, a valid email and a message.', 'err');
+    return;
+  }
+  // Fallback until a Web3Forms key is configured
+  if(WEB3FORMS_KEY === 'PASTE_YOUR_KEY_HERE'){
+    const subject = encodeURIComponent('Portfolio message from ' + name);
+    const body = encodeURIComponent(message + '\n\n— ' + name + ' (' + email + ')');
+    window.location.href = 'mailto:' + EMAIL + '?subject=' + subject + '&body=' + body;
+    setStatus('Opening your email app with the message filled in...', 'ok');
+    return;
+  }
+  formBtn.disabled = true;
+  setStatus('Sending...');
+  fd.append('access_key', WEB3FORMS_KEY);
+  fd.append('subject', 'New message from your portfolio');
+  fd.append('from_name', 'Portfolio contact form');
+  try{
+    const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { Accept: 'application/json' }, body: fd });
+    const data = await res.json();
+    if(!data.success) throw new Error(data.message || 'Request failed');
+    setStatus('Message sent. Thank you, I will get back to you soon.', 'ok');
+    form.reset();
+  }catch(err){
+    setStatus('Could not send right now. Please email me directly at ' + EMAIL + '.', 'err');
+  }finally{
+    formBtn.disabled = false;
+  }
+});
+
+/* ==========================================================================
+   G. DEMOS
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   G1. THz METAMATERIAL SENSOR
+   Model: absorption is a Lorentzian peak centred on f_res.
+          f_res(n) = F0 - S * (n - 1)   (S in THz per RIU, slider is GHz/RIU)
+   Illustrative only: the real response comes from the CST simulation.
+   -------------------------------------------------------------------------- */
+demos.thz = (() => {
+  const F0 = 3.892, FMIN = 3.2, FMAX = 4.1, GAMMA = 0.045;
+  const pad = { l: 48, r: 16, t: 14, b: 34 };
+  let cv, nIn, sIn, nOut, sOut, readout, dragging = false;
+  const fRes = (n, S) => F0 - (S / 1000) * (n - 1);                 // THz
+  const absorb = (f, fr) => 1 / (1 + Math.pow((f - fr) / GAMMA, 2));
+
+  function draw(){
+    const { ctx, w, h } = setupCanvas(cv);
+    const soft = css('--ink-soft'), grid = css('--line-strong'), cu = css('--copper'), bl = css('--blue-dim'), ink = css('--ink');
+    const n = parseFloat(nIn.value), S = parseFloat(sIn.value);
+    const fr = fRes(n, S);
+    const X = f => pad.l + (f - FMIN) / (FMAX - FMIN) * (w - pad.l - pad.r);
+    const Y = a => h - pad.b - a * (h - pad.t - pad.b);
+    ctx.clearRect(0, 0, w, h);
+    ctx.font = '11px "IBM Plex Mono", monospace';
+    // grid lines + axis labels
+    ctx.lineWidth = 1; ctx.strokeStyle = grid; ctx.fillStyle = soft;
+    for(let i = 0; i <= 9; i++){
+      const f = FMIN + i * 0.1, x = X(f);
+      ctx.globalAlpha = 0.3; ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, h - pad.b); ctx.stroke(); ctx.globalAlpha = 1;
+      if(i % 2 === 0){ ctx.textAlign = 'center'; ctx.fillText(f.toFixed(1), x, h - pad.b + 14); }
+    }
+    ctx.textAlign = 'right';
+    [0, 0.5, 1].forEach(a => {
+      ctx.globalAlpha = 0.3; ctx.beginPath(); ctx.moveTo(pad.l, Y(a)); ctx.lineTo(w - pad.r, Y(a)); ctx.stroke(); ctx.globalAlpha = 1;
+      ctx.fillText(a.toFixed(1), pad.l - 6, Y(a) + 4);
+    });
+    ctx.textAlign = 'center'; ctx.fillText('Frequency (THz)', (pad.l + w - pad.r) / 2, h - 4);
+    ctx.save(); ctx.translate(12, (pad.t + h - pad.b) / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('Absorption', 0, 0); ctx.restore();
+    // baseline curve (n = 1) dashed
+    function curve(center){
+      ctx.beginPath();
+      for(let px = pad.l; px <= w - pad.r; px += 2){
+        const f = FMIN + (px - pad.l) / (w - pad.l - pad.r) * (FMAX - FMIN);
+        const y = Y(absorb(f, center));
+        px === pad.l ? ctx.moveTo(px, y) : ctx.lineTo(px, y);
       }
-    });
-  }, { rootMargin: '-40% 0px -50% 0px' });
-  sections.forEach(s => s && spyObserver.observe(s));
+    }
+    ctx.setLineDash([5, 4]); ctx.strokeStyle = bl; ctx.lineWidth = 1.5; curve(F0); ctx.stroke(); ctx.setLineDash([]);
+    // live curve with soft fill
+    ctx.strokeStyle = cu; ctx.lineWidth = 2.5; curve(fr); ctx.stroke();
+    ctx.lineTo(w - pad.r, Y(0)); ctx.lineTo(pad.l, Y(0)); ctx.closePath();
+    ctx.globalAlpha = 0.12; ctx.fillStyle = cu; ctx.fill(); ctx.globalAlpha = 1;
+    // resonance marker
+    ctx.strokeStyle = cu; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(X(fr), Y(1)); ctx.lineTo(X(fr), Y(0)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = cu; ctx.beginPath(); ctx.moveTo(X(fr), Y(0) - 1); ctx.lineTo(X(fr) - 6, Y(0) + 9); ctx.lineTo(X(fr) + 6, Y(0) + 9); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = ink; ctx.textAlign = X(fr) > w - 120 ? 'right' : 'left';
+    ctx.fillText('f_res = ' + fr.toFixed(3) + ' THz', X(fr) + (X(fr) > w - 120 ? -8 : 8), Y(1) + 12);
+    ctx.fillStyle = bl; ctx.textAlign = 'left'; ctx.fillText('- - n = 1 (reference)', pad.l + 8, pad.t + 12);
+    // text readout
+    const dGHz = (fr - F0) * 1000;
+    readout.innerHTML = 'f<sub>res</sub> = <b>' + fr.toFixed(3) + ' THz</b> &nbsp;·&nbsp; Δf = <b>' + dGHz.toFixed(0) + ' GHz</b> &nbsp;·&nbsp; inferred n = <b>' + (1 + (F0 - fr) * 1000 / S).toFixed(3) + '</b>';
+  }
+  function sync(){
+    nOut.textContent = parseFloat(nIn.value).toFixed(3);
+    sOut.textContent = sIn.value + ' GHz/RIU';
+    draw();
+  }
+  // Convert a pointer x position into a measured peak and solve for n
+  function pointerToN(ev){
+    const r = cv.getBoundingClientRect();
+    const f = FMIN + ((ev.clientX - r.left) - pad.l) / (r.width - pad.l - pad.r) * (FMAX - FMIN);
+    const S = parseFloat(sIn.value);
+    nIn.value = clamp(1 + (F0 - f) * 1000 / S, 1, 1.6);
+    sync();
+  }
+  return {
+    init(){
+      cv = $('#thzCanvas'); nIn = $('#thzN'); sIn = $('#thzS'); nOut = $('#thzNOut'); sOut = $('#thzSOut'); readout = $('#thzReadout');
+      nIn.addEventListener('input', sync); sIn.addEventListener('input', sync);
+      cv.addEventListener('pointerdown', e => { dragging = true; cv.setPointerCapture(e.pointerId); pointerToN(e); });
+      cv.addEventListener('pointermove', e => { if(dragging) pointerToN(e); });
+      cv.addEventListener('pointerup', () => { dragging = false; });
+      sync();
+    },
+    redraw: () => draw()
+  };
+})();
 
-  // ----- Reveal on scroll -----
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if(entry.isIntersecting){
-        entry.target.classList.add('in');
-        revealObserver.unobserve(entry.target);
+/* --------------------------------------------------------------------------
+   G2. ANOMALY DETECTOR (behavioural model)
+   - keeps the last W samples (W = 4/8/16/32) and their average
+   - a sample is anomalous if |x - avg| > avg / 2^k   (k = 1..4 -> 50%..6.25%)
+   - "stream": every sample enters the window.  "hold": anomalous samples do
+     not enter the window (for at most 8 in a row, so it can recover).
+   - one-shot alerts fire once per burst; N-shot fires for the first 3 samples.
+   -------------------------------------------------------------------------- */
+demos.anom = (() => {
+  const WINS = [4, 8, 16, 32], PCT = ['50%', '25%', '12.5%', '6.25%'];
+  const SHOW = 140, STEP = 0.05, HOLD_LIMIT = 8;
+  let cv, wIn, kIn, wOut, kOut, led, stat, loop;
+  let win = [], sum = 0, hist = [], t = 0, acc = 0, ledT = 0;
+  let mode = 'stream', alertMode = 'one', run = 0, alerts = 0, total = 0, paused = false, spike = false;
+
+  function reset(){ win = []; sum = 0; hist = []; run = 0; }
+  // Produce one 8-bit sample: slow sine + noise, with rare random spikes
+  function sample(){
+    t++;
+    let x = 128 + 6 * Math.sin(t * 0.09) + rand(-3, 3);
+    if(spike){ x += (Math.random() < 0.5 ? -1 : 1) * rand(60, 90); spike = false; }
+    else if(Math.random() < 0.012){ x += (Math.random() < 0.5 ? -1 : 1) * rand(50, 90); }
+    return Math.round(clamp(x, 0, 255));
+  }
+  function step(){
+    const x = sample(), W = WINS[+wIn.value], k = +kIn.value;
+    let avg = null, thr = null, anom = false;
+    if(win.length >= W){ avg = sum / W; thr = avg / (1 << k); anom = Math.abs(x - avg) > thr; }
+    if(anom){
+      run++;
+      const fire = alertMode === 'one' ? run === 1 : run <= 3;
+      if(fire){ alerts++; ledT = 0.5; }
+    } else run = 0;
+    // "hold" keeps anomalies out of the window, but only for a few samples
+    const skip = anom && mode === 'hold' && run <= HOLD_LIMIT;
+    if(!skip){ win.push(x); sum += x; if(win.length > W) sum -= win.shift(); }
+    hist.push({ x, avg, thr, anom });
+    if(hist.length > SHOW) hist.shift();
+    total++;
+  }
+  function draw(){
+    const { ctx, w, h } = setupCanvas(cv);
+    const soft = css('--ink-soft'), grid = css('--line-strong'), cu = css('--copper'), bl = css('--blue'), ink = css('--ink');
+    const pad = { l: 36, r: 10, t: 22, b: 12 };
+    const Y = v => h - pad.b - (v - 40) / 180 * (h - pad.t - pad.b);
+    const X = j => pad.l + (SHOW - hist.length + j) / (SHOW - 1) * (w - pad.l - pad.r);
+    ctx.clearRect(0, 0, w, h);
+    ctx.font = '11px "IBM Plex Mono", monospace'; ctx.lineWidth = 1; ctx.strokeStyle = grid; ctx.fillStyle = soft; ctx.textAlign = 'right';
+    [60, 130, 200].forEach(v => {
+      ctx.globalAlpha = 0.3; ctx.beginPath(); ctx.moveTo(pad.l, Y(v)); ctx.lineTo(w - pad.r, Y(v)); ctx.stroke(); ctx.globalAlpha = 1;
+      ctx.fillText(v, pad.l - 5, Y(v) + 4);
+    });
+    // threshold band: avg ± thr
+    ctx.beginPath(); let started = false;
+    hist.forEach((p, j) => { if(p.avg == null) return; const y = Y(p.avg + p.thr); started ? ctx.lineTo(X(j), y) : ctx.moveTo(X(j), y); started = true; });
+    for(let j = hist.length - 1; j >= 0; j--){ const p = hist[j]; if(p.avg != null) ctx.lineTo(X(j), Y(p.avg - p.thr)); }
+    ctx.closePath(); ctx.globalAlpha = 0.16; ctx.fillStyle = bl; ctx.fill(); ctx.globalAlpha = 1;
+    // moving average
+    ctx.beginPath(); started = false; ctx.strokeStyle = bl; ctx.lineWidth = 1.5;
+    hist.forEach((p, j) => { if(p.avg == null) return; started ? ctx.lineTo(X(j), Y(p.avg)) : ctx.moveTo(X(j), Y(p.avg)); started = true; });
+    ctx.stroke();
+    // raw signal
+    ctx.beginPath(); ctx.strokeStyle = ink; ctx.lineWidth = 1.2;
+    hist.forEach((p, j) => j ? ctx.lineTo(X(j), Y(p.x)) : ctx.moveTo(X(j), Y(p.x)));
+    ctx.stroke();
+    // anomaly markers
+    hist.forEach((p, j) => { if(!p.anom) return; ctx.beginPath(); ctx.arc(X(j), Y(p.x), 4, 0, 6.3); ctx.fillStyle = cu; ctx.fill(); });
+    // legend (shorter labels on narrow screens so it always fits)
+    const narrow = w < 520;
+    ctx.textAlign = 'left'; let lx = pad.l + 4;
+    (narrow ? [['sig', ink], ['avg', bl], ['±thr', bl], ['alert', cu]]
+            : [['signal', ink], ['moving avg', bl], ['± threshold', bl], ['anomaly', cu]]).forEach(([label, c]) => {
+      ctx.fillStyle = c; ctx.fillRect(lx, 8, 8, 8); ctx.fillStyle = soft; ctx.fillText(label, lx + 12, 16); lx += ctx.measureText(label).width + 28;
+    });
+    // readout
+    const last = hist[hist.length - 1];
+    const thrTxt = last && last.thr != null ? '±' + last.thr.toFixed(1) : 'warming up';
+    stat.textContent = 'window ' + WINS[+wIn.value] + ' · sensitivity ' + PCT[+kIn.value - 1] + ' · threshold ' + thrTxt + ' · samples ' + total + ' · alerts ' + alerts;
+    led.classList.toggle('on', ledT > 0);
+  }
+  return {
+    init(){
+      cv = $('#anCanvas'); wIn = $('#anW'); kIn = $('#anK'); wOut = $('#anWOut'); kOut = $('#anKOut'); led = $('#anLed'); stat = $('#anStat');
+      const sync = () => { wOut.textContent = WINS[+wIn.value]; kOut.textContent = PCT[+kIn.value - 1]; };
+      wIn.addEventListener('input', () => { sync(); reset(); });
+      kIn.addEventListener('input', sync); sync();
+      $$('[data-anmode]').forEach(b => b.addEventListener('click', () => {
+        mode = b.dataset.anmode; $$('[data-anmode]').forEach(x => x.classList.toggle('on', x === b)); }));
+      $$('[data-analert]').forEach(b => b.addEventListener('click', () => {
+        alertMode = b.dataset.analert; $$('[data-analert]').forEach(x => x.classList.toggle('on', x === b)); }));
+      $('#anSpike').addEventListener('click', () => { spike = true; });
+      $('#anPause').addEventListener('click', e => { paused = !paused; e.target.textContent = paused ? 'Resume' : 'Pause'; });
+      loop = makeLoop(dt => {
+        if(!paused){ acc += dt; while(acc >= STEP){ acc -= STEP; step(); } }
+        ledT = Math.max(0, ledT - dt);
+        draw();
+      });
+    },
+    start(){ loop && loop.start(); },
+    stop(){ loop && loop.stop(); },
+    redraw: () => cv && draw()
+  };
+})();
+
+/* --------------------------------------------------------------------------
+   G3. LoRa TOKEN RING
+   Six nodes share one channel. Only the node holding the token may transmit,
+   for a fixed 5 s window (sim time), then it passes the token on. Because
+   nobody else is allowed to talk, there are no collisions by construction.
+   -------------------------------------------------------------------------- */
+demos.ring = (() => {
+  const NS = 'http://www.w3.org/2000/svg';
+  const N = 6, CX = 200, CY = 128, R = 92, HOLD = 5, PASS = 0.5;
+  let svg, nodeEls = [], qEls = [], tokenEl, c1, c2, stat, speedIn, speedOut, autoBtn, loop;
+  let pos = [], q, holder, next, phase, tIn, sendT, delivered, blocked, simT, auto, autoT;
+
+  const el = (tag, attrs, parent) => {
+    const e = document.createElementNS(NS, tag);
+    Object.entries(attrs || {}).forEach(([k, v]) => e.setAttribute(k, v));
+    (parent || svg).appendChild(e); return e;
+  };
+  function reset(){
+    q = Array(N).fill(0); holder = 0; next = 1; phase = 'hold'; tIn = 0; sendT = 1; delivered = 0; blocked = 0; simT = 0; autoT = 0;
+  }
+  function pulse(a, b, color){
+    const line = el('line', { class: 'pulse', x1: pos[a].x, y1: pos[a].y, x2: b.x, y2: b.y });
+    if(color) line.style.stroke = color;
+    setTimeout(() => line.remove(), 650);
+  }
+  function enqueue(i){ if(q[i] < 5) q[i]++; }
+  function update(dt){
+    simT += dt;
+    if(auto){ autoT += dt; if(autoT >= 2){ autoT = 0; enqueue(Math.floor(Math.random() * N)); } }
+    if(phase === 'hold'){
+      tIn += dt; sendT += dt;
+      if(sendT >= 1 && q[holder] > 0){
+        sendT = 0; q[holder]--; delivered++;
+        let dst; do { dst = Math.floor(Math.random() * N); } while(dst === holder);
+        pulse(holder, pos[dst]);
       }
-    });
-  }, { threshold: 0.12 });
-  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+      if(tIn >= HOLD){ phase = 'pass'; tIn = 0; next = (holder + 1) % N; }
+    } else {
+      tIn += dt;
+      if(tIn >= PASS){ holder = next; phase = 'hold'; tIn = 0; sendT = 1; }
+    }
+  }
+  function render(){
+    nodeEls.forEach((g, i) => g.classList.toggle('holder', phase === 'hold' && i === holder));
+    qEls.forEach((t, i) => { t.textContent = q[i] ? 'q:' + q[i] : ''; });
+    // The token rides on a circle just outside the nodes and slides to the next angle while passing
+    const p = phase === 'pass' ? clamp(tIn / PASS, 0, 1) : 0;
+    const ang = pos[holder].a + p * (2 * Math.PI / N);
+    tokenEl.setAttribute('cx', CX + (R + 30) * Math.cos(ang));
+    tokenEl.setAttribute('cy', CY + (R + 30) * Math.sin(ang));
+    c1.textContent = 'token: N' + ((phase === 'pass' ? next : holder) + 1);
+    c2.textContent = phase === 'hold' ? 'window ' + Math.min(HOLD, tIn).toFixed(1) + ' / ' + HOLD + ' s' : 'passing...';
+    stat.innerHTML = 'delivered: <b>' + delivered + '</b> · collisions: <b>0</b> · blocked attempts: <b>' + blocked + '</b> · sim time: <b>' + simT.toFixed(0) + ' s</b>';
+  }
+  return {
+    init(){
+      svg = $('#ringSvg'); stat = $('#ringStat'); speedIn = $('#ringSpeed'); speedOut = $('#ringSpeedOut'); autoBtn = $('#ringAuto');
+      for(let i = 0; i < N; i++){ const a = -Math.PI / 2 + i * 2 * Math.PI / N; pos.push({ x: CX + R * Math.cos(a), y: CY + R * Math.sin(a), a }); }
+      el('circle', { class: 'edge', cx: CX, cy: CY, r: R });
+      pos.forEach((p, i) => {
+        const g = el('g', { class: 'node' });
+        const c = el('circle', { cx: p.x, cy: p.y, r: 19 }, g);
+        const label = el('text', { x: p.x, y: p.y + 4 }, g); label.textContent = 'N' + (i + 1);
+        const qt = el('text', { class: 'q', x: CX + (R - 34) * Math.cos(p.a), y: CY + (R - 34) * Math.sin(p.a) + 4 }, g);
+        c.addEventListener('click', () => { enqueue(i); render(); });
+        nodeEls.push(g); qEls.push(qt);
+      });
+      tokenEl = el('circle', { class: 'token', r: 7, cx: pos[0].x, cy: pos[0].y });
+      c1 = el('text', { class: 'center-t', x: CX, y: CY - 2 });
+      c2 = el('text', { class: 'center-t', x: CX, y: CY + 14 });
+      reset();
+      speedIn.addEventListener('input', () => { speedOut.textContent = speedIn.value + '×'; });
+      $('#ringQueue').addEventListener('click', () => { enqueue(Math.floor(Math.random() * N)); render(); });
+      $('#ringCollide').addEventListener('click', () => {
+        // A node that is not holding the token tries to talk: the protocol blocks it
+        let i; do { i = Math.floor(Math.random() * N); } while(i === holder);
+        blocked++; pulse(i, { x: CX, y: CY }, css('--g4'));
+        stat.innerHTML = 'N' + (i + 1) + ' tried to transmit without the token → <b>blocked</b>. Collisions stay at <b>0</b>.';
+      });
+      autoBtn.addEventListener('click', () => { auto = !auto; autoBtn.textContent = 'auto traffic: ' + (auto ? 'on' : 'off'); autoBtn.classList.toggle('on', auto); });
+      $('#ringReset').addEventListener('click', () => { reset(); render(); });
+      auto = false;
+      loop = makeLoop(dt => { update(dt * +speedIn.value); render(); });
+      render();
+    },
+    start(){ loop && loop.start(); },
+    stop(){ loop && loop.stop(); }
+  };
+})();
 
-  // ----- Project details toggle -----
-  document.querySelectorAll('[data-toggle]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const extra = btn.nextElementSibling;
-      const isOpen = extra.classList.toggle('open');
-      btn.textContent = isOpen ? 'HIDE DETAILS −' : 'SHOW DETAILS +';
-    });
-  });
+/* --------------------------------------------------------------------------
+   G4. NGAP BYTE EXPLORER
+   A hand-annotated, simplified NGSetupRequest-style message. The lengths are
+   internally consistent (the validator below really parses the bytes), but it
+   is a teaching sample, not a capture of a real PDU.
+   -------------------------------------------------------------------------- */
+demos.ngap = (() => {
+  // g = colour group (0 header, 1-4 one per protocol IE); b = bytes in hex
+  const FIELDS = [
+    { n: 'NGAP-PDU choice',    b: '00', g: 0, d: 'initiatingMessage (choice index 0)' },
+    { n: 'procedureCode',      b: '15', g: 0, d: '21 = NGSetup (TS 38.413)' },
+    { n: 'criticality',        b: '00', g: 0, d: 'reject' },
+    { n: 'Length determinant', b: '31', g: 0, d: '49 bytes follow' },
+    { n: 'Preamble + IE count',b: '00 00 04', g: 0, d: 'extension/optional bits, then 4 protocol IEs' },
+    { n: 'IE id',              b: '00 1b', g: 1, d: '27 = id-GlobalRANNodeID' },
+    { n: 'IE criticality',     b: '00', g: 1, d: 'reject' },
+    { n: 'IE length',          b: '08', g: 1, d: '8 bytes of value' },
+    { n: 'GlobalRANNodeID',    b: '00 00 f1 10 00 00 00 01', g: 1, d: 'globalGNB-ID choice, test PLMN 001/01, gNB-ID (simplified)' },
+    { n: 'IE id',              b: '00 52', g: 2, d: '82 = id-RANNodeName' },
+    { n: 'IE criticality',     b: '40', g: 2, d: 'ignore' },
+    { n: 'IE length',          b: '0a', g: 2, d: '10 bytes of value' },
+    { n: 'RANNodeName',        b: '08 67 6e 62 2d 73 76 2d 30 31', g: 2, d: 'length prefix, then ASCII "gnb-sv-01"' },
+    { n: 'IE id',              b: '00 66', g: 3, d: '102 = id-SupportedTAList' },
+    { n: 'IE criticality',     b: '00', g: 3, d: 'reject' },
+    { n: 'IE length',          b: '0b', g: 3, d: '11 bytes of value' },
+    { n: 'SupportedTAList',    b: '00 00 00 01 00 00 f1 10 00 08 00', g: 3, d: 'TAC, broadcast PLMN and slice support (simplified)' },
+    { n: 'IE id',              b: '00 15', g: 4, d: '21 = id-DefaultPagingDRX' },
+    { n: 'IE criticality',     b: '40', g: 4, d: 'ignore' },
+    { n: 'IE length',          b: '01', g: 4, d: '1 byte of value' },
+    { n: 'DefaultPagingDRX',   b: '60', g: 4, d: 'enumerated paging cycle (simplified)' }
+  ];
+  const ORIGINAL = [], OWNER = [];            // flat byte list + which field each byte belongs to
+  FIELDS.forEach((f, fi) => f.b.split(' ').forEach(h => { ORIGINAL.push(parseInt(h, 16)); OWNER.push(fi); }));
+  let bytes = ORIGINAL.slice(), box, field, verdict, pinned = -1;
+  const hex = v => v.toString(16).padStart(2, '0');
 
-  // ----- Copy email -----
-  document.querySelectorAll('[data-copy]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      try{
-        await navigator.clipboard.writeText(btn.getAttribute('data-copy'));
-        const original = btn.textContent;
-        btn.textContent = 'Copied';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1600);
-      }catch(e){}
+  // Parse like a decoder would: header length, IE count, then each IE's own length
+  function validate(b){
+    if(b.length < 8) return '✗ truncated: not enough bytes for a header';
+    if(b[3] !== b.length - 4) return '✗ malformed: length determinant says ' + b[3] + ' but ' + (b.length - 4) + ' bytes follow';
+    let i = 7, n = 0;
+    while(i < b.length){
+      if(i + 4 > b.length) return '✗ malformed: truncated IE header at byte ' + i;
+      const id = (b[i] << 8) | b[i + 1], len = b[i + 3];
+      if(i + 4 + len > b.length) return '✗ malformed: IE id ' + id + ' claims ' + len + ' bytes but only ' + (b.length - i - 4) + ' remain';
+      i += 4 + len; n++;
+    }
+    return n === b[6] ? { ok: '✓ well-formed: ' + n + ' IEs, ' + (b.length - 4) + ' bytes after the header' }
+                      : '✗ malformed: header says ' + b[6] + ' IEs but ' + n + ' parsed';
+  }
+  function show(fi){
+    const f = FIELDS[fi];
+    field.innerHTML = '';
+    const a = document.createElement('div'); a.className = 'fn'; a.textContent = f.n;
+    const b = document.createElement('div'); b.className = 'fh'; b.textContent = f.b;
+    const c = document.createElement('div'); c.textContent = f.d;
+    field.append(a, b, c);
+    $$('.byte', box).forEach(el => {
+      const mine = +el.dataset.f === fi;
+      el.classList.toggle('sel', mine); el.classList.toggle('dim', !mine);
     });
-  });
+  }
+  function clearSel(){
+    if(pinned >= 0) return show(pinned);
+    $$('.byte', box).forEach(el => el.classList.remove('sel', 'dim'));
+  }
+  function render(){
+    box.innerHTML = '';
+    bytes.forEach((v, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'byte'; btn.type = 'button'; btn.textContent = hex(v);
+      btn.dataset.f = OWNER[i];
+      btn.style.setProperty('--c', 'var(--g' + FIELDS[OWNER[i]].g + ')');
+      btn.addEventListener('mouseenter', () => show(OWNER[i]));
+      btn.addEventListener('focus', () => show(OWNER[i]));
+      btn.addEventListener('mouseleave', clearSel);
+      btn.addEventListener('click', () => { pinned = OWNER[i]; show(pinned); });
+      box.appendChild(btn);
+    });
+    const r = validate(bytes);
+    const ok = typeof r === 'object';
+    verdict.textContent = ok ? r.ok : r;
+    verdict.className = 'verdict ' + (ok ? 'ok' : 'bad');
+  }
+  return {
+    init(){
+      box = $('#bytes'); field = $('#fieldBox'); verdict = $('#ngapVerdict');
+      $('#ngapLen').addEventListener('click', () => { bytes[3] = (bytes[3] + 6) & 255; render(); });
+      $('#ngapTrunc').addEventListener('click', () => { if(bytes.length > 8) bytes.pop(); render(); });
+      $('#ngapReset').addEventListener('click', () => { bytes = ORIGINAL.slice(); pinned = -1; field.textContent = 'Select a byte to see which field it belongs to.'; render(); });
+      render();
+    }
+  };
+})();
 
-  // ----- Back to top -----
-  const totop = document.getElementById('totop');
-  window.addEventListener('scroll', () => {
-    totop.classList.toggle('show', window.scrollY > 600);
-  });
-  totop.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
+/* --------------------------------------------------------------------------
+   G5. ANGEL BOT DASHBOARD
+   A 12x7 grid. A hidden gas source sits at (9, 2). Gas reading rises as the
+   robot gets close; crossing the alarm threshold triggers the alert.
+   -------------------------------------------------------------------------- */
+demos.bot = (() => {
+  const COLS = 12, ROWS = 7, HAZ = { x: 9, y: 2 };
+  const RUBBLE = new Set(['4,1', '4,2', '4,3', '6,4', '6,5', '7,4']);
+  const CMD = { up: 'FWD', down: 'BACK', left: 'LEFT', right: 'RIGHT' };
+  const DELTA = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+  let cv, gasVal, gauge, gasMark, thrIn, thrOut, alertTag, micEl, logEl, loop;
+  let rx, ry, face, gasShown, alarm, visited, found, lines, micT;
+
+  const d2 = (x, y) => (x - HAZ.x) * (x - HAZ.x) + (y - HAZ.y) * (y - HAZ.y);
+  const gasAt = (x, y) => 90 + 760 * Math.exp(-d2(x, y) / 7);
+  function log(line){ lines.push(line); if(lines.length > 5) lines.shift(); logEl.textContent = lines.join('\n'); }
+  function move(dir){
+    face = dir;
+    const [dx, dy] = DELTA[dir], nx = rx + dx, ny = ry + dy;
+    if(nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS || RUBBLE.has(nx + ',' + ny)){ log('[blocked] ' + CMD[dir]); return; }
+    rx = nx; ry = ny; visited.add(rx + ',' + ry);
+    log('[Blynk] V1 = ' + CMD[dir] + '  → (' + rx + ',' + ry + ')');
+  }
+  function draw(){
+    const { ctx, w, h } = setupCanvas(cv);
+    const soft = css('--ink-soft'), grid = css('--line-strong'), cu = css('--copper'), ink = css('--ink'), bad = css('--g4');
+    const cs = Math.min(w / COLS, h / ROWS), ox = (w - cs * COLS) / 2, oy = (h - cs * ROWS) / 2;
+    ctx.clearRect(0, 0, w, h);
+    for(let y = 0; y < ROWS; y++) for(let x = 0; x < COLS; x++){
+      const key = x + ',' + y, px = ox + x * cs, py = oy + y * cs;
+      if(visited.has(key)){ ctx.globalAlpha = 0.12; ctx.fillStyle = cu; ctx.fillRect(px, py, cs, cs); ctx.globalAlpha = 1; }
+      if(found.has(key)){ ctx.globalAlpha = 0.45; ctx.fillStyle = bad; ctx.fillRect(px, py, cs, cs); ctx.globalAlpha = 1; }
+      if(RUBBLE.has(key)){ ctx.fillStyle = soft; ctx.globalAlpha = 0.55; ctx.fillRect(px + 2, py + 2, cs - 4, cs - 4); ctx.globalAlpha = 1; }
+      ctx.strokeStyle = grid; ctx.globalAlpha = 0.4; ctx.strokeRect(px, py, cs, cs); ctx.globalAlpha = 1;
+    }
+    // robot: circle with a heading marker
+    const cx = ox + (rx + 0.5) * cs, cy = oy + (ry + 0.5) * cs, r = cs * 0.3;
+    ctx.fillStyle = cu; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 6.3); ctx.fill();
+    const [fx, fy] = DELTA[face];
+    ctx.fillStyle = ink; ctx.beginPath(); ctx.arc(cx + fx * r * 0.9, cy + fy * r * 0.9, r * 0.3, 0, 6.3); ctx.fill();
+    ctx.fillStyle = soft; ctx.font = '10px "IBM Plex Mono", monospace'; ctx.textAlign = 'left';
+    ctx.fillText('gray = rubble · red = gas found', ox + 4, h - 4);
+  }
+  return {
+    init(){
+      cv = $('#botMap'); gasVal = $('#gasVal'); gauge = $('#gasGauge'); gasMark = $('#gasMark'); thrIn = $('#gasThr'); thrOut = $('#gasThrOut');
+      alertTag = $('#botAlert'); micEl = $('#mic'); logEl = $('#botLog');
+      rx = 1; ry = 3; face = 'right'; gasShown = gasAt(rx, ry); alarm = false; visited = new Set([rx + ',' + ry]); found = new Set(); lines = []; micT = 0;
+      for(let i = 0; i < 14; i++) micEl.appendChild(document.createElement('i'));
+      const syncThr = () => { thrOut.textContent = thrIn.value; gasMark.style.left = (thrIn.value / 900 * 100) + '%'; };
+      thrIn.addEventListener('input', syncThr); syncThr();
+      $$('[data-dir]', $('#demo-bot')).forEach(b => b.addEventListener('click', () => move(b.dataset.dir)));
+      cv.addEventListener('click', () => cv.focus());
+      cv.addEventListener('keydown', e => {
+        const map = { ArrowUp: 'up', w: 'up', ArrowDown: 'down', s: 'down', ArrowLeft: 'left', a: 'left', ArrowRight: 'right', d: 'right' };
+        const dir = map[e.key]; if(!dir) return;
+        e.preventDefault(); move(dir);
+      });
+      log('[boot] ESP32-CAM streaming, I2S mic ok');
+      loop = makeLoop(dt => {
+        // Smoothly follow the true gas value, plus a little sensor noise
+        const target = gasAt(rx, ry) + rand(-12, 12);
+        gasShown += (target - gasShown) * Math.min(1, dt * 5);
+        const g = Math.max(0, Math.round(gasShown));
+        gasVal.textContent = g;
+        gauge.firstElementChild.style.width = clamp(g / 900, 0, 1) * 100 + '%';
+        const now = g > +thrIn.value;
+        if(now) found.add(rx + ',' + ry);
+        if(now !== alarm){ alarm = now; log(alarm ? '[ALARM] gas over threshold, buzzer ON' : '[ok] gas back under threshold'); }
+        gauge.classList.toggle('alarm', alarm); alertTag.classList.toggle('show', alarm);
+        // microphone bars: louder near the hazard (simulated hiss)
+        micT += dt;
+        if(micT > 0.08){
+          micT = 0;
+          const level = 0.12 + 0.6 * Math.exp(-d2(rx, ry) / 12);
+          Array.from(micEl.children).forEach(b => { b.style.height = clamp(level * rand(0.4, 1) * 100, 6, 100) + '%'; });
+        }
+        draw();
+      });
+      draw();
+    },
+    start(){ loop && loop.start(); },
+    stop(){ loop && loop.stop(); },
+    redraw: () => cv && draw()
+  };
+})();
+
+/* ==========================================================================
+   H. EXTRAS: KEYBOARD SHORTCUTS, KONAMI CODE, CONSOLE BANNER
+   ========================================================================== */
+const isTyping = t => t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable);
+document.addEventListener('keydown', e => {
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k'){ e.preventDefault(); palette.hidden ? openPalette() : closePalette(); return; }
+  if(e.key === 'Escape'){ closePalette(); lightbox.hidden = true; return; }
+  if(isTyping(e.target) || e.ctrlKey || e.metaKey || e.altKey) return;
+  if(e.key === '/'){ e.preventDefault(); openPalette(); }
+  else if(e.key.toLowerCase() === 't' && e.target.tagName !== 'CANVAS'){ toggleTheme(); }
+});
+
+// Konami code: up up down down left right left right b a  ->  toggles a retro CRT look
+const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let kpos = 0;
+document.addEventListener('keydown', e => {
+  if(isTyping(e.target)) return;
+  kpos = (e.key === KONAMI[kpos]) ? kpos + 1 : (e.key === KONAMI[0] ? 1 : 0);
+  if(kpos === KONAMI.length){ kpos = 0; root.classList.toggle('crt'); toast(root.classList.contains('crt') ? 'CRT mode on. You found the Konami code.' : 'CRT mode off'); }
+});
+
+// Greeting for anyone who opens the browser console
+console.log('%cSUDARSHAN V', 'font:700 22px monospace;color:#A6620A');
+console.log('Curious about the code? The whole site is one index.html.\nTry the terminal on the page ("help") or press Ctrl+K.\nContact: ' + EMAIL);
+
+})();
 </script>
 
 </body>
 </html>
-
-
