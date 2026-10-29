@@ -1354,7 +1354,7 @@
 
 /* ---------- Settings you may want to change ---------- */
 // Get a free key at https://web3forms.com (it is emailed to you), then paste it here.
-const WEB3FORMS_KEY = 'PASTE_YOUR_KEY_HERE';
+const WEB3FORMS_KEY = 'YOUR_ACCESS_KEY';
 const EMAIL = 'sudarshan060617@gmail.com';
 // Resume lives on Google Drive (make sure sharing is "Anyone with the link")
 const RESUME_URL = 'https://drive.google.com/file/d/1qvv8MSny8AOLjq_RA7kGPKbyn1bnn3J1/view?usp=sharing';
@@ -1817,7 +1817,7 @@ form.addEventListener('submit', async e => {
     return;
   }
   // Fallback until a Web3Forms key is configured
-  if(WEB3FORMS_KEY === 'PASTE_YOUR_KEY_HERE'){
+  if(WEB3FORMS_KEY === 'YOUR_ACCESS_KEY'){
     const subject = encodeURIComponent('Portfolio message from ' + name);
     const body = encodeURIComponent(message + '\n\n— ' + name + ' (' + email + ')');
     window.location.href = 'mailto:' + EMAIL + '?subject=' + subject + '&body=' + body;
