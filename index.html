@@ -1281,10 +1281,9 @@
 
   <!-- =====================================================
        07 — CONTACT
-       The form posts to Web3Forms (free, no backend needed) from JS.
-       Put your access key in WEB3FORMS_KEY in the script below.
-       If it is still the placeholder, the form falls back to opening
-       the visitor's email app with the message pre-filled.
+       The form is sent from JS (see section F in the script) straight to
+       the email address set in EMAIL, with no mail app opening. It uses
+       FormSubmit by default (no key needed; one-time activation email).
        ===================================================== -->
   <footer class="frame" id="contact">
     <span class="desig">07</span>
@@ -1353,7 +1352,11 @@
 'use strict';
 
 /* ---------- Settings you may want to change ---------- */
-// Get a free key at https://web3forms.com (it is emailed to you), then paste it here.
+// BEST OPTION: your own backend. Deploy the Google Apps Script from the setup guide,
+// then paste its Web app URL (ends in /exec) here. Leave '' to use FormSubmit instead.
+const APPS_SCRIPT_URL = '';
+// OPTIONAL. If APPS_SCRIPT_URL is empty the form uses FormSubmit (no key needed).
+// If you prefer Web3Forms, get a free key at https://web3forms.com and paste it here.
 const WEB3FORMS_KEY = 'YOUR_ACCESS_KEY';
 const EMAIL = 'sudarshan060617@gmail.com';
 // Resume lives on Google Drive (make sure sharing is "Anyone with the link")
@@ -1798,9 +1801,10 @@ setTimeout(bootTerminal, 900);
 
 /* ==========================================================================
    F. CONTACT FORM
-   Sends the message through Web3Forms. While WEB3FORMS_KEY is still the
-   placeholder, it opens the visitor's email app with the message filled in,
-   so the form is never a dead end.
+   Sends the message to EMAIL without opening any mail app.
+   Priority: 1) APPS_SCRIPT_URL (your own Google Apps Script backend)
+             2) Web3Forms, if WEB3FORMS_KEY is set
+             3) FormSubmit (no key; one-time activation email to EMAIL)
    ========================================================================== */
 const form = $('#contactForm'), formBtn = $('#formBtn'), formStatus = $('#formStatus');
 function setStatus(msg, cls){ formStatus.textContent = msg; formStatus.className = 'form-status' + (cls ? ' ' + cls : ''); }
@@ -1808,7 +1812,6 @@ form.addEventListener('submit', async e => {
   e.preventDefault();
   const fd = new FormData(form);
   if(fd.get('botcheck')) return;                       // honeypot was filled: it is a bot
-  fd.delete('botcheck');
   const name = String(fd.get('name') || '').trim();
   const email = String(fd.get('email') || '').trim();
   const message = String(fd.get('message') || '').trim();
@@ -1816,25 +1819,47 @@ form.addEventListener('submit', async e => {
     setStatus('Please fill in your name, a valid email and a message.', 'err');
     return;
   }
-  // Fallback until a Web3Forms key is configured
-  if(WEB3FORMS_KEY === 'YOUR_ACCESS_KEY'){
-    const subject = encodeURIComponent('Portfolio message from ' + name);
-    const body = encodeURIComponent(message + '\n\n— ' + name + ' (' + email + ')');
-    window.location.href = 'mailto:' + EMAIL + '?subject=' + subject + '&body=' + body;
-    setStatus('Opening your email app with the message filled in...', 'ok');
-    return;
-  }
   formBtn.disabled = true;
   setStatus('Sending...');
-  fd.append('access_key', WEB3FORMS_KEY);
-  fd.append('subject', 'New message from your portfolio');
-  fd.append('from_name', 'Portfolio contact form');
   try{
-    const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { Accept: 'application/json' }, body: fd });
-    const data = await res.json();
-    if(!data.success) throw new Error(data.message || 'Request failed');
-    setStatus('Message sent. Thank you, I will get back to you soon.', 'ok');
-    form.reset();
+    let ok = false, needsActivation = false;
+    if(APPS_SCRIPT_URL){
+      // Your own backend (Google Apps Script). "text/plain" keeps this a simple request,
+      // so the browser does not need a CORS preflight, which Apps Script cannot answer.
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ name, email, message, botcheck: '' })
+      });
+      ok = (await res.json()).ok === true;
+    } else if(WEB3FORMS_KEY !== 'YOUR_ACCESS_KEY'){
+      // Option B: Web3Forms (only when a key has been pasted above)
+      const body = new FormData();
+      body.append('access_key', WEB3FORMS_KEY);
+      body.append('subject', 'New message from your portfolio');
+      body.append('from_name', 'Portfolio contact form');
+      body.append('name', name); body.append('email', email); body.append('message', message);
+      const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { Accept: 'application/json' }, body });
+      ok = (await res.json()).success === true;
+    } else {
+      // Default: FormSubmit. The "email" field is used as the reply-to address.
+      const res = await fetch('https://formsubmit.co/ajax/' + EMAIL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ name, email, message, _subject: 'New message from your portfolio', _captcha: 'false', _template: 'table' })
+      });
+      const data = await res.json();
+      ok = String(data.success) === 'true';
+      needsActivation = /activat/i.test(String(data.message || ''));
+    }
+    if(ok){
+      setStatus('Message sent. Thank you, I will get back to you soon.', 'ok');
+      form.reset();
+    } else if(needsActivation){
+      setStatus('The form is waiting for its one-time activation. Please email me directly at ' + EMAIL + ' for now.', 'err');
+    } else {
+      throw new Error('send failed');
+    }
   }catch(err){
     setStatus('Could not send right now. Please email me directly at ' + EMAIL + '.', 'err');
   }finally{
