@@ -13,6 +13,25 @@
      ============================================================ -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Swarm intro: this tiny script runs before the first paint. It marks the page "sw-boot" so the
+     page is blank (not a flash of the finished site) while the cursor swarm starts up.
+     It stays off for reduced-motion users, for ?swarm=off, and after the intro was seen this session
+     (add ?swarm=1 to the URL to force it). The engine removes the class as soon as it takes over. -->
+<script>
+(function(){try{
+  /* Dark mode is the default; a saved choice (the header toggle) wins */
+  var th='dark'; try{th=localStorage.getItem('sv-theme')||'dark';}catch(e){}
+  document.documentElement.setAttribute('data-theme',th==='light'?'light':'dark');
+}catch(e){}
+try{
+  var q=location.search,done=false;
+  try{done=sessionStorage.getItem('sv-swarm-done')==='1';}catch(e){}
+  var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!rm&&!/[?&]swarm=off/.test(q)&&(/[?&]swarm=1/.test(q)||!done)){document.documentElement.classList.add('sw-boot');setTimeout(function(){document.documentElement.classList.remove('sw-boot');},4000);}
+}catch(e){}})();
+</script>
+<meta name="theme-color" content="#14171A">
+<link rel="canonical" href="https://sudarshan.is-a.dev/">
 <title>Sudarshan V — Hardware Engineer</title>
 <meta name="description" content="Portfolio of Sudarshan V — Electronics and Communication Engineering student specializing in ASIC design, RF and antenna engineering, and embedded systems.">
 <!-- Favicon: inline SVG so no extra file request is needed -->
@@ -28,8 +47,16 @@
 <meta name="twitter:description" content="ASIC design, RF/antenna engineering, and embedded systems.">
 <meta name="twitter:image" content="https://sudarshan.is-a.dev/images/profile.jpg">
 <!-- Fonts: IBM Plex Mono (headings, code-like text) + IBM Plex Sans (body) -->
+<!-- Structured data: helps search engines understand who this page is about -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Person","name":"Sudarshan V","url":"https://sudarshan.is-a.dev",
+ "jobTitle":"Electronics and Communication Engineering student",
+ "affiliation":{"@type":"CollegeOrUniversity","name":"College of Engineering, Guindy"},
+ "knowsAbout":["ASIC design and verification","RF and antenna engineering","Embedded systems","5G core signaling protocols"],
+ "sameAs":["https://github.com/Sudarshan-veera","https://linkedin.com/in/sudarshan-veera8"]}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
 <style>
   /* =========================================================
      1. THEME VARIABLES
@@ -812,6 +839,185 @@
     section.block{padding:32px 18px;}
     header.frame{padding:12px 16px;}
   }
+
+  /* ---------- Swarm intro (see the sv-swarm-engine script) ---------- */
+  html.sw-boot .sheet{opacity:0;}
+  .sw-hide{opacity:0 !important; pointer-events:none !important;}
+  .sw-layer{position:fixed; inset:0; pointer-events:none; z-index:9999; overflow:hidden;}
+  .sw-cur{position:absolute; left:0; top:0; will-change:transform; transition:opacity 0.35s ease;}
+  .sw-cur.idle{opacity:0;}
+  .sw-cur svg{position:absolute; display:none; filter:drop-shadow(0 1px 1.5px rgba(0,0,0,0.35));}
+  .sw-cur[data-m="arrow"] .i-arrow{display:block; left:-1px; top:-1px;}
+  .sw-cur[data-m="cross"] .i-cross{display:block; left:-11px; top:-11px;}
+  .sw-cur[data-m="ibeam"] .i-ibeam{display:block; left:-6px; top:-11px;}
+  .sw-cur[data-m="pen"] .i-pen{display:block; left:-1px; top:-21px;}
+  .sw-tag{position:absolute; left:13px; top:15px; font:600 10px/1 'IBM Plex Mono', monospace; color:#fff; padding:3px 6px; border-radius:3px; white-space:nowrap; letter-spacing:0.05em;}
+  .sw-box{position:absolute; border:1px dashed var(--copper); background:rgba(166,98,10,0.07);}
+  .sw-box i{position:absolute; width:6px; height:6px; background:var(--paper); border:1px solid var(--copper);}
+  .sw-box i.tl{left:-4px; top:-4px;} .sw-box i.tr{right:-4px; top:-4px;} .sw-box i.bl{left:-4px; bottom:-4px;} .sw-box i.br{right:-4px; bottom:-4px;}
+  .sw-box b{position:absolute; left:0; top:-20px; font:500 10px/1 'IBM Plex Mono', monospace; background:var(--copper); color:var(--paper); padding:3px 5px; white-space:nowrap;}
+  .sw-guide{position:absolute; left:0; right:0; height:0; border-top:1px solid var(--blue);}
+  .sw-guide.v{right:auto; left:0; top:0; bottom:0; width:0; height:auto; border-top:0; border-left:1px solid var(--blue);}
+  .sw-hud{position:fixed; left:14px; bottom:14px; z-index:9998; display:flex; align-items:center; gap:6px; font:500 11px/1 'IBM Plex Mono', monospace; background:var(--paper); color:var(--ink); border:1px solid var(--line-strong); padding:5px 6px;}
+  .sw-hud button{font:inherit; background:var(--paper-2); color:var(--ink); border:1px solid var(--line-strong); padding:4px 7px; cursor:pointer;}
+  .sw-hud button:hover{border-color:var(--copper); color:var(--copper);}
+  .sw-hud .sw-st{padding:0 4px; color:var(--copper);}
+  .sw-hud.idle .sw-st, .sw-hud.idle [data-a="speed"], .sw-hud.idle [data-a="sound"], .sw-hud.idle [data-a="skip"]{display:none;}
+  .sw-hud.run [data-a="replay"]{display:none;}
+  .sw-hud.idle{opacity:0.55; transition:opacity 0.2s;} .sw-hud.idle:hover, .sw-hud.idle:focus-within{opacity:1;}
+  @media (max-width:640px){ .sw-hud{left:8px; bottom:8px; font-size:10px;} .sw-hud .sw-st{display:none;} }
+  @media print{ .sw-layer, .sw-hud{display:none !important;} .sw-hide{opacity:1 !important;} html.sw-boot .sheet{opacity:1;} }
+  /* skill pills on project cards and the usage badge on skill chips */
+  .skill-chip .n{display:inline-block; margin-left:5px; padding:0 4px; font-size:10px; background:var(--copper); color:var(--paper); border-radius:8px;}
+  .skill-chip.on .n{background:var(--paper); color:var(--copper);}
+  .sk-row{display:flex; flex-wrap:wrap; gap:5px; margin:10px 0 2px; align-items:center;}
+  .sk-row .sk-lbl{font:500 10.5px/1 'IBM Plex Mono', monospace; color:var(--ink-soft); letter-spacing:0.08em; margin-right:2px;}
+  .sk-pill{font:500 11.5px/1 'IBM Plex Mono', monospace; background:transparent; color:var(--blue); border:1px solid var(--blue-dim); padding:3px 7px; cursor:pointer; border-radius:10px; transition:background .2s,color .2s,border-color .2s;}
+  .sk-pill:hover, .sk-pill.on{background:var(--blue); color:var(--paper); border-color:var(--blue);}
+
+  /* ---------- Lab bench ---------- */
+  .lab-note{color:var(--ink-soft); max-width:640px; margin:0 0 18px;}
+  .lab-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .lab-card{border:1px solid var(--line-strong); background:var(--paper-2); padding:14px; min-width:0;}
+  .lab-card.wide{grid-column:1/-1;}
+  .lab-card h3{font:600 13px/1.3 'IBM Plex Mono', monospace; margin:0 0 10px; display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap;}
+  .lab-tag{font-weight:500; font-size:10.5px; color:var(--copper); letter-spacing:.06em;}
+  .lab-card canvas{width:100%; display:block; background:#0E1114; border:1px solid var(--line-strong); touch-action:none;}
+  .lab-ctl{display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; margin-top:10px; font:12px 'IBM Plex Mono', monospace; color:var(--ink-soft);}
+  .lab-ctl input[type=range]{vertical-align:middle; width:120px; accent-color:var(--copper);}
+
+  .chip-legend{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;}
+  .chip-legend button{display:inline-flex; align-items:center; gap:6px; font:12px 'IBM Plex Mono', monospace; color:var(--ink); background:var(--paper); border:1px solid var(--line-strong); padding:4px 9px; cursor:pointer;}
+  .chip-legend button i{width:10px; height:10px; display:inline-block; border-radius:2px;}
+  .chip-legend button[aria-pressed="false"]{opacity:.38;}
+  .chip-legend button:hover{border-color:var(--ink-soft);}
+  .chip-stats{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:12px;}
+  .chip-stats>div{border:1px solid var(--line-strong); background:var(--paper); padding:8px 10px; display:flex; flex-direction:column; gap:2px; min-width:0;}
+  @media (max-width:760px){.chip-stats{grid-template-columns:repeat(2,1fr);}}
+  .chip-stats .k{font:11px 'IBM Plex Mono', monospace; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.04em;}
+  .chip-stats .v{font:600 17px 'IBM Plex Mono', monospace; color:var(--ink);}
+  .chip-stats .s{font:11px 'IBM Plex Mono', monospace; color:var(--ink-soft);}
+  .lab-ctl b{color:var(--ink); font-weight:600; display:inline-block; min-width:62px;}
+  .lab-read{margin-top:8px; font:12px/1.5 'IBM Plex Mono', monospace; color:var(--ink-soft);}
+  .gh-feed-unused{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px; font-size:13px;}
+  .gh-repo{display:block; border:1px solid var(--line-strong); background:var(--paper); padding:10px 12px; text-decoration:none; color:var(--ink);}
+  .gh-repo:hover{border-color:var(--copper);}
+  .gh-repo b{display:block; font:600 13px 'IBM Plex Mono', monospace; color:var(--blue); margin-bottom:4px; overflow-wrap:anywhere;}
+  .gh-repo span{display:block; color:var(--ink-soft); font-size:12.5px;}
+  .gh-repo small{display:block; margin-top:6px; font:11px 'IBM Plex Mono', monospace; color:var(--copper);}
+  @media (max-width:800px){ .lab-grid{grid-template-columns:1fr;} .lab-ctl input[type=range]{width:100px;} }
+  /* spotlight that follows the mouse over the grid paper (desktop only) */
+  .sv-spot{position:fixed; inset:0; pointer-events:none; z-index:1; background:radial-gradient(260px circle at var(--mx,50%) var(--my,40%), rgba(224,164,92,0.10), transparent 70%); opacity:0; transition:opacity .4s;}
+  .sv-spot.on{opacity:1;}
+  @media (hover:none), print{ .sv-spot{display:none;} }
+  /* boot (POST) screen shown before the swarm starts */
+  .sw-post{position:fixed; inset:0; z-index:10000; background:#0E1114; color:#7FD9A0; font:13px/1.7 'IBM Plex Mono', monospace; padding:6vh 6vw; white-space:pre; overflow:hidden; transition:opacity .45s;}
+  .sw-post.out{opacity:0;}
+  .sw-post b{color:#E0A45C; font-weight:600;}
+
+  .gwin{border:1px solid #2A2F35; background:#0E1114; color:#D8DDD8; height:210px; display:flex; flex-direction:column;}
+  .gwin-bar{display:flex; align-items:center; gap:6px; padding:7px 10px; background:#171B20; border-bottom:1px solid #2A2F35; font:11px 'IBM Plex Mono', monospace; color:#8A9199;}
+  .gwin-bar i{width:9px; height:9px; border-radius:50%; background:#3A4048;} .gwin-bar i:first-child{background:#FF6B6B;} .gwin-bar i:nth-child(2){background:#E0A45C;} .gwin-bar i:nth-child(3){background:#7FD9A0;}
+  .gwin-bar span{margin-left:8px;}
+  .gwin-body{flex:1; overflow:auto; padding:8px 12px; font:12px/1.65 'IBM Plex Mono', monospace; white-space:pre-wrap; overflow-wrap:anywhere;}
+  .gwin-body a{color:inherit; text-decoration:none;} .gwin-body a:hover{text-decoration:underline;}
+  .g-hash{color:#E0A45C;} .g-repo{color:#6E9BE0;} .g-dim{color:#8A9199;} .g-ok{color:#7FD9A0;}
+  html.brand-io:not(.name-out) .frame .brand{opacity:0;}
+  .frame .brand{transition:opacity .3s ease;}
+
+  /* ---------- Engineering logbook (handwritten notes on grid paper) ---------- */
+  .log-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px;}
+  .log-page{
+    background-color:#FBF8EE; color:#2B2A33; padding:16px 18px 14px 26px; position:relative;
+    background-image:linear-gradient(rgba(60,110,180,.20) 1px, transparent 1px), linear-gradient(90deg, rgba(60,110,180,.20) 1px, transparent 1px);
+    background-size:20px 20px; border:1px solid #D8D2BE; box-shadow:2px 3px 0 rgba(0,0,0,.08);
+    font-family:'Caveat','Segoe Script','Comic Sans MS',cursive; font-size:19px; line-height:20px;
+  }
+  .log-page::before{content:''; position:absolute; left:14px; top:0; bottom:0; border-left:2px solid rgba(200,60,60,.45);}
+  .log-meta{display:flex; justify-content:space-between; gap:8px; font:600 10.5px 'IBM Plex Mono', monospace; color:#7A6B3C; letter-spacing:.06em; margin-bottom:6px;}
+  .log-page h3{font-family:'Caveat',cursive; font-size:27px; line-height:26px; margin:2px 0 10px; color:#1F3A7A; font-weight:700;}
+  .log-page p{margin:0 0 10px; font-size:19px; line-height:20px;}
+  .log-page code{font:12px 'IBM Plex Mono', monospace; background:rgba(0,0,0,.06); padding:0 3px;}
+  .log-page .log-sign{color:#A6310A; font-weight:700; margin-top:12px;}
+  /* Morse LED */
+  .term-bar{align-items:center;}
+  .morse-led{margin-left:auto; width:9px; height:9px; border-radius:50%; background:#3D2E12; transition:background .04s, box-shadow .04s;}
+  .morse-led.on{background:#FFCF5C; box-shadow:0 0 10px 3px rgba(255,207,92,.85);}
+  .chip .pin1.morse-on{background:#FFCF5C !important; box-shadow:0 0 14px 5px rgba(255,207,92,.9) !important;}
+  /* "sudo rm -rf /" aftermath */
+  .sv-panic{position:fixed; inset:0; z-index:20000; background:#0A0B0D; color:#7FD9A0; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:14px; padding:8vw; font:14px/1.7 'IBM Plex Mono', monospace; opacity:0; transition:opacity .6s;}
+  .sv-panic.on{opacity:1;}
+  .sv-panic b{color:#FF6B6B;}
+  .sv-panic button{font:inherit; background:#E0A45C; color:#14171A; border:0; padding:8px 16px; cursor:pointer; font-weight:600;}
+  /* Datasheet: hidden on screen, shown instead of the site when printing */
+  #datasheet{display:none;}
+  @media print{
+    @page{size:A4; margin:11mm;}
+    html, body{background:#fff !important; color:#000 !important;}
+    body > *:not(#datasheet){display:none !important;}
+    #datasheet{display:block; font:8.6pt/1.32 'IBM Plex Sans', Arial, Helvetica, sans-serif; color:#111;}
+    #datasheet .ds-top{display:flex; justify-content:space-between; align-items:flex-end; border-bottom:3px solid #C00; padding-bottom:6px; margin-bottom:8px;}
+    #datasheet .ds-pn{font:700 24pt/1 'IBM Plex Mono', 'Courier New', monospace; letter-spacing:.02em;}
+    #datasheet .ds-sub{font-size:10pt; color:#333; margin-top:3px;}
+    #datasheet .ds-rev{font:600 8pt/1.4 'IBM Plex Mono', monospace; text-align:right; color:#C00;}
+    #datasheet .ds-cols{display:grid; grid-template-columns:1fr 1fr; gap:0 16px; margin-bottom:6px;}
+    #datasheet h4{font:700 9pt/1.2 Arial, sans-serif; text-transform:uppercase; letter-spacing:.04em; background:#E9E9E9; border-left:4px solid #C00; padding:2px 6px; margin:8px 0 4px;}
+    #datasheet ul{margin:0; padding-left:14px;} #datasheet li{margin-bottom:2px;}
+    #datasheet p{margin:0 0 4px;}
+    #datasheet table{width:100%; border-collapse:collapse; margin-bottom:4px;}
+    #datasheet th, #datasheet td{border:1px solid #BBB; padding:2px 5px; text-align:left; vertical-align:top;}
+    #datasheet th{background:#F2F2F2;}
+    #datasheet .ds-foot{border-top:1px solid #999; margin-top:8px; padding-top:4px; font-size:7pt; color:#555;}
+    #datasheet *{break-inside:avoid;}
+  }
+
+  .how{margin:12px 0 4px; padding-left:20px; font-size:14px; color:var(--ink-soft);} .how li{margin-bottom:6px;} .how b{color:var(--ink);}
+  .lab-fine{margin:6px 0 0; font:11.5px/1.5 'IBM Plex Mono', monospace; color:var(--ink-soft);}
+
+  /* ---------- A Day in the Lab (scroll story) ---------- */
+  .story-wrap{height:420vh; position:relative;}
+  .story-stick{position:sticky; top:64px; height:calc(100vh - 84px); min-height:460px; display:grid; grid-template-columns:1.4fr 1fr; grid-template-rows:auto 1fr; gap:12px 22px;}
+  .story-rail{grid-column:1/-1; display:flex; gap:6px; flex-wrap:wrap;}
+  .story-rail button{font:500 12px 'IBM Plex Mono', monospace; background:var(--paper-2); color:var(--ink-soft); border:1px solid var(--line-strong); padding:6px 10px; cursor:pointer;}
+  .story-rail button.on{background:var(--copper); color:var(--paper); border-color:var(--copper);}
+  #storyc{width:100%; height:100%; min-height:300px; background:#0E1114; border:1px solid var(--line-strong); display:block;}
+  .story-text{align-self:center;}
+  .story-text .st-n{font:600 11px 'IBM Plex Mono', monospace; color:var(--copper); letter-spacing:.08em;}
+  .story-text h3{font:700 24px/1.2 'IBM Plex Sans', sans-serif; margin:6px 0 8px;}
+  .story-text p{margin:0 0 10px; color:var(--ink-soft); font-size:15px;}
+  .story-text .st-proj{font:12px 'IBM Plex Mono', monospace; color:var(--blue);}
+  .story-text.swap{opacity:0; transform:translateY(8px);} .story-text{transition:opacity .35s, transform .35s;}
+  @media (max-width:800px){ .story-stick{grid-template-columns:1fr; grid-template-rows:auto minmax(0,1fr) auto; top:56px; height:calc(100vh - 70px);} .story-wrap{height:380vh;} .story-text h3{font-size:19px;} .story-text p{font-size:13.5px; margin-bottom:6px;} #storyc{min-height:220px;} }
+  /* ---------- /hire-me chip start-up and contact card ---------- */
+  .sv-hire{position:fixed; inset:0; z-index:20000; background:rgba(8,10,12,.92); display:flex; align-items:center; justify-content:center; padding:16px; opacity:0; transition:opacity .35s;}
+  .sv-hire.on{opacity:1;}
+  .hire-stage{position:relative; width:min(460px,100%); min-height:330px; display:flex; align-items:center; justify-content:center; flex-direction:column; color:#D8DDD8; font:12.5px/1.7 'IBM Plex Mono', monospace;}
+  .hire-chip{position:relative; width:150px; height:150px; background:#1A1F25; border:2px solid #3A4048; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#8A9199; font:700 15px 'IBM Plex Mono', monospace; letter-spacing:.06em; transition:transform .6s ease, opacity .6s ease, box-shadow .6s;}
+  .hire-chip.live{box-shadow:0 0 40px 6px rgba(224,164,92,.45); color:#E0A45C; border-color:#E0A45C;}
+  .hire-chip.gone{transform:scale(.25); opacity:0;}
+  .hire-chip .led{position:absolute; left:10px; top:10px; width:9px; height:9px; border-radius:50%; background:#3D2E12;}
+  .hire-chip.live .led{background:#FFCF5C; box-shadow:0 0 10px 3px rgba(255,207,92,.9); animation:hireBlink 1s infinite;}
+  @keyframes hireBlink{50%{opacity:.35;}}
+  .hire-chip .pin{position:absolute; width:14px; height:5px; background:#3A4048; transition:background .15s, box-shadow .15s;}
+  .hire-chip .pin.v{width:5px; height:14px;}
+  .hire-chip .pin.on{background:#7FD9A0; box-shadow:0 0 8px 2px rgba(127,217,160,.7);}
+  .hire-log{margin:18px 0 0; min-height:120px; white-space:pre; color:#7FD9A0; transition:opacity .4s;}
+  .hire-log.gone{opacity:0; height:0; min-height:0; margin:0;}
+  .hire-card{position:absolute; inset:auto; width:100%; background:#14171A; border:1px solid #E0A45C; box-shadow:0 0 50px rgba(224,164,92,.25); padding:22px 22px 18px; opacity:0; transform:scale(.85) translateY(10px); pointer-events:none; transition:opacity .5s, transform .5s;}
+  .hire-card.show{opacity:1; transform:none; pointer-events:auto; animation:hireGlow 2.6s ease-in-out infinite;}
+  @keyframes hireGlow{50%{box-shadow:0 0 70px rgba(224,164,92,.45);}}
+  .hire-card h3{margin:0 0 2px; font:700 22px 'IBM Plex Mono', monospace; color:#F1EEE6;}
+  .hire-card .sub{color:#E0A45C; margin-bottom:14px; font-size:12px;}
+  .hire-card .row{display:flex; gap:10px; align-items:center; padding:6px 0; border-top:1px solid #2A2F35; opacity:0; transform:translateX(-10px); color:#D8DDD8;}
+  .hire-card.show .row{animation:hireRow .45s forwards;}
+  @keyframes hireRow{to{opacity:1; transform:none;}}
+  .hire-card .row b{min-width:74px; color:#8A9199; font-weight:500;} .hire-card a{color:#6E9BE0; text-decoration:none; overflow-wrap:anywhere;} .hire-card a:hover{text-decoration:underline;}
+  .hire-card button{font:inherit; background:#E0A45C; color:#14171A; border:0; padding:6px 12px; cursor:pointer; font-weight:600;}
+  .hire-card .row button.mini{padding:2px 8px; background:#2A2F35; color:#D8DDD8; font-weight:500;}
+  .hire-x{position:absolute; right:8px; top:6px; background:transparent !important; color:#8A9199 !important; font-size:20px; padding:0 6px !important;}
+  .hire-skip{position:absolute; bottom:-6px; font-size:11px; color:#8A9199;}
+  @media (prefers-reduced-motion: reduce){ .hire-card, .hire-card .row{transition:none; animation:none !important; opacity:1; transform:none;} }
+  .arch{width:100%; max-width:560px; margin:8px 0; color:var(--ink-soft);}
 </style>
 </head>
 <body>
@@ -834,6 +1040,7 @@
     <nav id="nav">
       <a href="#skills" data-nav>Skills</a>
       <a href="#projects" data-nav>Projects</a>
+      <a href="#lab" data-nav>Lab</a>
       <a href="#experience" data-nav>Experience</a>
       <a href="#contact" data-nav>Contact</a>
       <button class="theme-toggle" id="paletteBtn" title="Open command palette (Ctrl+K)"><kbd>Ctrl</kbd><kbd>K</kbd></button>
@@ -854,6 +1061,7 @@
       <span>Chennai, Tamil Nadu</span>
       <a href="mailto:sudarshan060617@gmail.com">sudarshan060617@gmail.com</a>
       <button class="copy-btn" data-copy="sudarshan060617@gmail.com">Copy Email</button>
+      <button class="copy-btn" id="dsBtn" title="Opens the print dialog with a datasheet-style PDF layout">Generate Datasheet</button>
       <a href="tel:+919025876308">+91 90258 76308</a>
       <a href="https://linkedin.com/in/sudarshan-veera8" target="_blank" rel="noopener">linkedin.com/in/sudarshan-veera8</a>
       <a href="https://github.com/Sudarshan-veera" target="_blank" rel="noopener">github.com/Sudarshan-veera</a>
@@ -863,15 +1071,15 @@
 
     <!-- At-a-glance numbers; they count up when scrolled into view -->
     <div class="stats">
-      <div class="stat"><div class="num"><span class="count" data-to="4">0</span></div><div class="lbl">projects</div></div>
+      <div class="stat"><div class="num"><span class="count" data-to="6">0</span></div><div class="lbl">projects</div></div>
       <div class="stat"><div class="num"><span class="count" data-to="186.3" data-dec="1">0</span> µW</div><div class="lbl">ASIC power @ nominal</div></div>
       <div class="stat"><div class="num"><span class="count" data-to="3.892" data-dec="3">0</span> THz</div><div class="lbl">sensor resonance</div></div>
-      <div class="stat"><div class="num"><span class="count" data-to="6">0</span></div><div class="lbl">certifications</div></div>
+      <div class="stat"><div class="num"><span class="count" data-to="9">0</span></div><div class="lbl">certifications</div></div>
     </div>
 
     <!-- Interactive mini terminal: type "help" -->
     <div class="term" id="term" aria-label="Interactive terminal">
-      <div class="term-bar"><i></i><i></i><i></i><span>sv@portfolio: ~ — type <b>help</b></span></div>
+      <div class="term-bar"><i></i><i></i><i></i><span>sv@portfolio: ~ — type <b>help</b></span><b class="morse-led" id="morseLed" title="Morse LED: try the command  morse sos"></b></div>
       <div class="term-body" id="termBody">
         <div id="termLog"></div>
         <div class="term-row"><span class="p" style="color:#E0A45C">$</span><input class="term-input" id="termInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Terminal input"></div>
@@ -949,14 +1157,17 @@
        ===================================================== -->
   <section class="block reveal" id="skills">
     <div class="block-head"><span class="desig">02</span><h2>Skills</h2></div>
-    <p class="skill-hint">Tip: click a skill to highlight the projects where it was used.</p>
+    <p class="skill-hint">Tip: click any skill to highlight where it was used. The small number is how many projects use it.</p>
     <table class="bom">
       <thead><tr><th>Category</th><th>Items</th></tr></thead>
       <tbody>
         <tr><td class="cat">Languages</td><td>
-          <button class="skill-chip" data-skill="Python">Python</button><span style="color:var(--ink-soft)">(NumPy, Pandas, Matplotlib, Seaborn)</span>
+          <button class="skill-chip" data-skill="Python">Python</button>
           <button class="skill-chip" data-skill="C">C</button>
           <button class="skill-chip" data-skill="C++">C++ (DSA)</button>
+          <button class="skill-chip" data-skill="Verilog HDL">Verilog HDL</button>
+          <button class="skill-chip" data-skill="Bash">Bash</button>
+          <span style="color:var(--ink-soft)">Python: NumPy, Pandas, Matplotlib, Seaborn</span>
         </td></tr>
         <tr><td class="cat">Tools</td><td>
           <button class="skill-chip" data-skill="MATLAB">MATLAB</button>
@@ -964,6 +1175,7 @@
           <button class="skill-chip" data-skill="CST Studio Suite">CST Studio Suite</button>
           <button class="skill-chip" data-skill="GNU Radio">GNU Radio</button>
           <button class="skill-chip" data-skill="LTspice">LTspice</button>
+          <button class="skill-chip" data-skill="ADS">ADS</button>
           <button class="skill-chip" data-skill="Altium Designer">Altium Designer</button>
           <button class="skill-chip" data-skill="NS-3">NS-3</button>
           <button class="skill-chip" data-skill="Wireshark">Wireshark</button>
@@ -978,19 +1190,39 @@
           <button class="skill-chip" data-skill="STM32CubeIDE">STM32CubeIDE</button>
           <button class="skill-chip" data-skill="Docker">Docker</button>
           <button class="skill-chip" data-skill="Linux">Linux</button>
+          <button class="skill-chip" data-skill="Ninja">Ninja</button>
+        </td></tr>
+        <tr><td class="cat">Web</td><td>
+          <button class="skill-chip" data-skill="HTML">HTML</button>
+          <button class="skill-chip" data-skill="CSS">CSS</button>
+          <span style="color:var(--ink-soft)">This portfolio is hand-written HTML, CSS and vanilla JavaScript</span>
+        </td></tr>
+        <tr><td class="cat">Wireless&nbsp;&amp;&nbsp;IoT</td><td>
+          <button class="skill-chip" data-skill="EMANE">EMANE</button>
+          <button class="skill-chip" data-skill="NGAP / NAS">NGAP / NAS</button>
+          <button class="skill-chip" data-skill="APER">APER encoding</button>
+          <button class="skill-chip" data-skill="LoRa">LoRa</button>
+          <button class="skill-chip" data-skill="ESP32">ESP32</button>
+          <button class="skill-chip" data-skill="MQ-135">MQ-135</button>
+          <button class="skill-chip" data-skill="INMP441">INMP441</button>
+          <button class="skill-chip" data-skill="I2S">I2S</button>
+          <button class="skill-chip" data-skill="Blynk IoT">Blynk IoT</button>
         </td></tr>
       </tbody>
     </table>
     <div class="skill-status" id="skillStatus" aria-live="polite"></div>
     <div class="cert-list">
-      <h3>Certifications</h3>
+      <h3>Certifications <span style="font-weight:400">(click one to open that certificate)</span></h3>
       <div class="cert-tags">
-        <a href="https://github.com/Sudarshan-veera/Sudarshan-veera/tree/main/assets" target="_blank" rel="noopener">NPTEL Data Science Python — 2025</a>
-        <a href="https://github.com/Sudarshan-veera/Sudarshan-veera/tree/main/assets" target="_blank" rel="noopener">MATLAB Onramp — 2025</a>
-        <a href="https://github.com/Sudarshan-veera/Sudarshan-veera/tree/main/assets" target="_blank" rel="noopener">Simulink Onramp — 2026</a>
-        <a href="https://github.com/Sudarshan-veera/Sudarshan-veera/tree/main/assets" target="_blank" rel="noopener">CCNA Academic Certification — 2026</a>
-        <a href="https://github.com/Sudarshan-veera/Sudarshan-veera/tree/main/assets" target="_blank" rel="noopener">Altium PCB Design — 2026</a>
-        <a href="https://github.com/Sudarshan-veera/Sudarshan-veera/tree/main/assets" target="_blank" rel="noopener">Verilog HDL: VLSI Hardware Design — 2026</a>
+        <a href="https://github.com/Sudarshan-veera/Sudarshan-veera/blob/main/assets/nptel-data-science-python-2025.jpeg" target="_blank" rel="noopener" title="Opens the certificate file">NPTEL Python for Data Science — 2025</a>
+        <a href="https://github.com/Sudarshan-veera/Sudarshan-veera/blob/main/assets/matlab-onramp-2025.pdf" target="_blank" rel="noopener" title="Opens the certificate file">MATLAB Onramp — 2025</a>
+        <a href="https://github.com/Sudarshan-veera/Sudarshan-veera/blob/main/assets/simulink-onramp-2026.pdf" target="_blank" rel="noopener" title="Opens the certificate file">Simulink Onramp — 2026</a>
+        <a href="https://github.com/Sudarshan-veera/Sudarshan-veera/blob/main/assets/ccna-intro-networks-cert.pdf" target="_blank" rel="noopener" title="Opens the certificate file">CCNA: Introduction to Networks — 2026</a>
+        <a href="https://github.com/Sudarshan-veera/Sudarshan-veera/blob/main/assets/ccna-switching-routing-cert.pdf" target="_blank" rel="noopener" title="Opens the certificate file">CCNA: Switching, Routing &amp; Wireless Essentials — 2026</a>
+        <a href="https://github.com/Sudarshan-veera/Sudarshan-veera/blob/main/assets/altium-pcb-design-2026.pdf" target="_blank" rel="noopener" title="Opens the certificate file">Altium PCB Design — 2026</a>
+        <a href="https://github.com/Sudarshan-veera/Sudarshan-veera/blob/main/assets/verilog-hdl-udemy-2026.jpeg" target="_blank" rel="noopener" title="Opens the certificate file">Verilog HDL: VLSI Hardware Design — 2026</a>
+        <a href="https://www.linkedin.com/learning/certificates/5e7de50f96047d87914ad486ff53fec8eb7dac28204ac4307c2207862a140e86" target="_blank" rel="noopener" title="Opens the LinkedIn Learning certificate">LinkedIn Learning — Certificate 1</a>
+        <a href="https://www.linkedin.com/learning/certificates/ffdf0654ed46654061b9eb8b9374f7931eff315012962026c39723c8a58f34cb" target="_blank" rel="noopener" title="Opens the LinkedIn Learning certificate">LinkedIn Learning — Certificate 2</a>
       </div>
     </div>
   </section>
@@ -1001,7 +1233,7 @@
        ===================================================== -->
   <section class="block reveal" id="experience">
     <div class="block-head"><span class="desig">03</span><h2>Internship</h2></div>
-    <div class="exp-item" data-skills="Python|Wireshark">
+    <div class="exp-item" data-skills="Python|Wireshark|NGAP / NAS|APER|Linux|GitHub">
       <div class="when">2026</div>
       <div>
         <h3>BaSig Wireless</h3>
@@ -1060,7 +1292,8 @@
           <div><span class="k">Resonant frequency</span><span class="v">3.892 THz</span></div>
           <div><span class="k">Simulation platform</span><span class="v">CST Studio Suite</span></div>
           <div><span class="k">Structure</span><span class="v">GaAs – Al – polyimide</span></div>
-          <div><span class="k">Performance</span><span class="v">High-Q resonant absorption</span></div>
+          <div><span class="k">Performance</span><span class="v">Q = 30.22, high-Q resonant absorption</span></div>
+          <div><span class="k">Application</span><span class="v">Soil moisture sensing (VWC 1–40 %)</span></div>
         </div>
         <div class="btn-row">
           <button class="ds-more-btn" data-toggle="thz-details" aria-expanded="false">View Details +</button>
@@ -1071,6 +1304,7 @@
             <ul>
               <li>Engineered and simulated a GaAs–Al–polyimide THz metamaterial sensor operating at 3.892 THz.</li>
               <li>Achieved high-Q resonant absorption to enable highly sensitive refractive index detection.</li>
+              <li>Co-authored the manuscript "Design of Novel Metamaterial Enhanced Terahertz Sensor for Soil Moisture Sensing" (Q = 30.22; moisture modelled with Topp's equation). Submitted to a journal; transfer to another journal pending.</li>
               <li>Improved sensing performance by tuning GaAs layer conductivity and determined unknown material refractive indices through resonant frequency shift analysis.</li>
             </ul>
           </div>
@@ -1091,7 +1325,7 @@
     </div>
 
     <!-- Project 2: TinyTapeout anomaly detector -->
-    <div class="datasheet-card" id="project-tt" data-tags="asic" data-skills="Python|Linux|GitHub">
+    <div class="datasheet-card" id="project-tt" data-tags="asic" data-skills="Verilog HDL|cocotb|OpenROAD|SKY130|TinyTapeout|Python|GitHub|Linux">
       <div class="ds-head">
         <span class="title">TinyTapeout — Hardware Adaptive Anomaly Detector</span>
         <span class="year">2026</span>
@@ -1141,7 +1375,7 @@
     </div>
 
     <!-- Project 3: LoRa campus chat -->
-    <div class="datasheet-card" id="project-lora" data-tags="networking rf" data-skills="NS-3|Simulink|Linux">
+    <div class="datasheet-card" id="project-lora" data-tags="networking rf" data-skills="NS-3|Simulink|LoRa|Bash|Ninja|Linux">
       <div class="ds-head">
         <span class="title">LoRa-Based Campus Chat System Using Token Passing<span class="rf-icon" style="transform:translateY(2px) scale(0.85);"><i class="dot"></i><i class="wave wave1"></i><i class="wave wave2"></i></span></span>
         <span class="year">2026</span>
@@ -1186,18 +1420,18 @@
     </div>
 
     <!-- Project 4: ANGEL BOT -->
-    <div class="datasheet-card" id="project-angel" data-tags="embedded" data-skills="Arduino IDE|C++">
+    <div class="datasheet-card" id="project-angel" data-tags="embedded" data-skills="ESP32|MQ-135|INMP441|Arduino IDE|C++|Blynk IoT|I2S">
       <div class="ds-head">
         <span class="title">ANGEL BOT — IoT-Based Disaster Rescue Robot</span>
         <span class="year">2025</span>
       </div>
       <div class="ds-body">
         <p style="margin:0 0 4px; color:var(--ink-soft); font-size:14.5px;">ESP32-based rescue robot for hazardous-zone navigation with continuous environmental monitoring.</p>
-        <div class="tag-row"><span class="tag">Embedded</span><span class="tag">IoT</span><span class="tag">ESP32</span></div>
+        <div class="tag-row"><span class="tag">Embedded</span><span class="tag">IoT</span><span class="tag">ESP32</span><span class="tag">MQ-135</span></div>
         <div class="spec-grid">
           <div><span class="k">Video</span><span class="v">ESP32-CAM, real-time stream</span></div>
           <div><span class="k">Audio</span><span class="v">INMP441 MEMS mic, I2S</span></div>
-          <div><span class="k">Sensing</span><span class="v">MQ-series gas sensors</span></div>
+          <div><span class="k">Sensing</span><span class="v">MQ-135 air-quality / gas sensor</span></div>
         </div>
         <div class="btn-row">
           <button class="ds-more-btn" data-toggle="angel-details" aria-expanded="false">View Details +</button>
@@ -1206,8 +1440,23 @@
         <div class="ds-extra" id="angel-details">
           <div class="ds-extra-inner">
             <ul>
+              <li>Hardware: an ESP32-CAM streams video, an MQ-135 sensor measures air quality and gases, and an INMP441 MEMS microphone module captures audio over I2S.</li>
               <li>Combined wireless remote control with live sensor telemetry for hazardous gas detection in the field.</li>
               <li>Controlled via Blynk IoT and Dumbdisplay for real-time monitoring and navigation.</li>
+            </ul>
+            <svg class="arch" viewBox="0 0 560 130" role="img" aria-label="ANGEL BOT block diagram: MQ-135, INMP441 and camera feed the ESP32, which sends data over Wi-Fi to the Blynk app and drives the motors">
+              <g font-family="IBM Plex Mono, monospace" font-size="11" fill="none" stroke="currentColor" stroke-width="1.3">
+                <rect x="6" y="8" width="120" height="30" rx="3"/><text x="16" y="27" fill="currentColor" stroke="none">MQ-135 gas</text>
+                <rect x="6" y="50" width="120" height="30" rx="3"/><text x="16" y="69" fill="currentColor" stroke="none">INMP441 mic (I2S)</text>
+                <rect x="6" y="92" width="120" height="30" rx="3"/><text x="16" y="111" fill="currentColor" stroke="none">OV2640 camera</text>
+                <rect x="210" y="40" width="120" height="50" rx="4" stroke="#E0A45C"/><text x="226" y="62" fill="currentColor" stroke="none">ESP32-CAM</text><text x="226" y="78" fill="currentColor" stroke="none">controller</text>
+                <rect x="430" y="8" width="124" height="30" rx="3"/><text x="440" y="27" fill="currentColor" stroke="none">Blynk app (Wi-Fi)</text>
+                <rect x="430" y="50" width="124" height="30" rx="3"/><text x="440" y="69" fill="currentColor" stroke="none">Dumbdisplay</text>
+                <rect x="430" y="92" width="124" height="30" rx="3"/><text x="440" y="111" fill="currentColor" stroke="none">Motors (drive)</text>
+                <path d="M126 23 L210 55 M126 65 L210 65 M126 107 L210 77 M330 55 L430 23 M330 65 L430 65 M330 75 L430 107"/>
+              </g>
+            </svg>
+            <ul>
             </ul>
           </div>
         </div>
@@ -1219,7 +1468,7 @@
           <div class="bot-grid">
             <canvas id="botMap" tabindex="0" aria-label="Map of the rescue area. Use arrow keys to drive."></canvas>
             <div>
-              <div class="demo-readout" style="margin-top:0">MQ gas sensor: <b id="gasVal">0</b> ppm <span class="alert-tag" id="botAlert">⚠ GAS ALERT</span></div>
+              <div class="demo-readout" style="margin-top:0">MQ-135 gas sensor: <b id="gasVal">0</b> ppm <span class="alert-tag" id="botAlert">⚠ GAS ALERT</span></div>
               <div class="gauge" id="gasGauge"><i></i><b id="gasMark"></b></div>
               <label class="demo-controls" style="margin:4px 0;"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft)">Alarm threshold</span> <input type="range" id="gasThr" min="150" max="800" step="10" value="400"><output id="gasThrOut" style="font-family:'IBM Plex Mono',monospace;font-size:12px">400</output></label>
               <div class="demo-readout" style="margin-top:6px">I2S mic level (simulated)</div>
@@ -1237,6 +1486,65 @@
         <a class="ds-link" href="https://github.com/Sudarshan-veera/Angel-bot" target="_blank" rel="noopener">→ View repository</a>
       </div>
     </div>
+
+    <!-- Project 5: Dual-band tunable FSS (final-year project, in progress) -->
+    <div class="datasheet-card" id="project-fss" data-tags="rf" data-skills="CST Studio Suite|ADS">
+      <div class="ds-head">
+        <span class="title">Flexible Dual-Band Tunable FSS Absorber — Final-Year Project</span>
+        <span class="year">2026 · in progress</span>
+      </div>
+      <div class="ds-body">
+        <p style="margin:0 0 4px; color:var(--ink-soft); font-size:14.5px;">A flexible, ultra-thin frequency selective surface whose two absorption bands are tuned electrically: varactor diodes shift the frequency and a graphene capacitor sets the absorption level. Team project under Dr. S. Sangeetha.</p>
+        <div class="tag-row"><span class="tag">RF</span><span class="tag">Metasurface</span><span class="tag">Simulation</span></div>
+        <div class="spec-grid">
+          <div><span class="k">Tuning range</span><span class="v">1.64–3.12 GHz and 4.73–6.32 GHz</span></div>
+          <div><span class="k">Tuning elements</span><span class="v">MA46H120 varactors + graphene (0.01–0.3 eV)</span></div>
+          <div><span class="k">Angular stability</span><span class="v">45° TE, 60° TM</span></div>
+          <div><span class="k">Tools</span><span class="v">CST (EM) + ADS (equivalent circuit)</span></div>
+        </div>
+        <div class="btn-row"><button class="ds-more-btn" data-toggle="fss-details" aria-expanded="false">View Details +</button></div>
+        <div class="ds-extra" id="fss-details">
+          <div class="ds-extra-inner">
+            <ul>
+              <li>Four design iterations (Design 1 to 4) led to the final cell: concentric split rings plus a chamfered outer slot ring, with four symmetric varactors so both polarizations respond the same.</li>
+              <li>Design 4 reaches a deep second-band minimum of about −52.7 dB near 5.1 GHz (over 99.99 % absorption).</li>
+              <li>Varactor capacitance (0.2–1.1 pF) moves the bands, and the two bands change bandwidth in opposite directions. Graphene chemical potential controls each band's absorption independently.</li>
+              <li>Built an equivalent transmission-line circuit and compared ADS results with CST to explain the resonances.</li>
+              <li>Stack-up is about 4.8 mm overall: F4B substrate, PET and graphene layer with ionic electrolyte, a high-resistance sheet, foam spacer and ground plane.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project 6: TDMA schedule planner (Vaan Megam Networks task) -->
+    <div class="datasheet-card" id="project-tdma" data-tags="networking" data-skills="Python|MATLAB|NS-3|EMANE|Linux|GitHub">
+      <div class="ds-head">
+        <span class="title">TDMA Schedule Planner &amp; Optimizer — Vaan Megam Networks</span>
+        <span class="year">2026</span>
+      </div>
+      <div class="ds-body">
+        <p style="margin:0 0 4px; color:var(--ink-soft); font-size:14.5px;">A wireless-protocol task: a Python "TDMA brain" that plans and optimizes slot schedules, an EMANE emulation bonus, and slot-level MATLAB and ns-3 simulations of the resulting schedule.</p>
+        <div class="tag-row"><span class="tag">Networking</span><span class="tag">MAC layer</span><span class="tag">Simulation</span></div>
+        <div class="spec-grid">
+          <div><span class="k">Planner</span><span class="v">Python scheduling "brain"</span></div>
+          <div><span class="k">Emulation</span><span class="v">EMANE</span></div>
+          <div><span class="k">Simulation</span><span class="v">MATLAB + ns-3.43</span></div>
+        </div>
+        <div class="btn-row"><button class="ds-more-btn" data-toggle="tdma-details" aria-expanded="false">View Details +</button></div>
+        <div class="ds-extra" id="tdma-details">
+          <div class="ds-extra-inner">
+            <ul>
+              <li>Part 1: built the scheduling brain in Python, which assigns and optimizes TDMA slots.</li>
+              <li>Part 2 (bonus): ran the schedule in the EMANE network emulator.</li>
+              <li>Cross-checked the schedule with slot-level simulations in MATLAB and in ns-3.43.</li>
+              <li>Submitted for review by Vaan Megam Networks.</li>
+            </ul>
+          </div>
+        </div>
+        <a class="ds-link" href="https://github.com/Sudarshan-veera/tdma-optimizer" target="_blank" rel="noopener">→ View repository</a>
+      </div>
+    </div>
   </section>
 
   <!-- =====================================================
@@ -1248,6 +1556,152 @@
       <div>
         <h3>Taping out a SKY130 ASIC as a student</h3>
         <p style="color:var(--ink-soft); max-width:680px;">The TinyTapeout submission meant working within real silicon constraints rather than simulation-only limits — an 80% tile utilization ceiling, a strict power budget, and gate-level checks that don't forgive shortcuts. The most instructive part was debugging forbidden met5 PDN violations and cocotb X-value errors: each fix required tracing the issue back through the physical design flow in OpenROAD rather than just the RTL. It reframed hardware design as a negotiation with the fabrication process, not just the logic.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       04.3 — ENGINEERING LOGBOOK: short technical post-mortems, handwritten on grid paper
+       ===================================================== -->
+  <section class="block reveal" id="logbook">
+    <div class="block-head"><span class="desig">04.3</span><h2>Engineering Logbook</h2></div>
+    <p class="lab-note">Short post-mortems from my own projects: what broke, why, and what fixed it.</p>
+    <div class="log-grid">
+
+      <article class="log-page">
+        <div class="log-meta"><span>LOG 03</span><span>TinyTapeout · SKY130</span></div>
+        <h3>Two bugs, one submission: met5 straps and X-values</h3>
+        <p><b>Problem 1: met5.</b> The hardening flow kept putting power-grid straps on met5, and TinyTapeout reserves that layer for its own top-level grid, so the check failed. The default flow builds a multi-layer power distribution network (PDN), and that is where met5 came from.</p>
+        <p><b>Fix:</b> I set <code>PDN_MULTILAYER: false</code> in <code>src/user_config.json</code> so the grid stays on lower layers. Lesson: once I edited the config by hand, I never re-ran <code>--create-user-config</code>, because it would overwrite my overrides. A few tall met5 straps were still being investigated afterwards, so I check the report after every run.</p>
+        <p><b>Problem 2: X-values in cocotb.</b> The gate-level simulation showed X (unknown) on the outputs. My moving-average detector keeps a window of past samples in flip-flops, and in the gate-level netlist those start unknown. Until the window is full, every average is X, and the X spreads to the anomaly flag.</p>
+        <p><b>Fix:</b> pre-fill the window with known samples first, then poll the READY signal instead of waiting a fixed number of clock cycles. The test now waits for the design instead of guessing.</p>
+        <p class="log-sign">Takeaway: reset and warm-up matter more in gate-level sim than RTL. RTL forgives; the netlist does not.</p>
+      </article>
+
+      <article class="log-page">
+        <div class="log-meta"><span>LOG 02</span><span>ANGEL BOT · ESP32-CAM</span></div>
+        <h3>Power notes for rev 2 (planning, not measured yet)</h3>
+        <p>Rescue robots fail when the power rail dips, and the symptom is always confusing: random resets that look like software bugs. These are my design notes for the next revision, not measured results.</p>
+        <p><b>Where the current goes.</b> Streaming video over Wi-Fi makes the ESP32-CAM draw short, large current spikes, typically a few hundred mA, so check the module datasheet. The MQ-135 gas sensor has a heater element that draws a steady current of its own, and motors add noisy surges. The INMP441 microphone barely registers.</p>
+        <p><b>Plan.</b> (1) Give the motors their own driver and supply path, sharing only ground with the logic. (2) Put a bulk capacitor right at the camera module's supply pins to absorb Wi-Fi bursts. (3) Use a regulator rated well above the worst-case peak, not the average. (4) Let the sensors warm up before trusting their readings, and wake them only when needed.</p>
+        <p><b>Security note.</b> While reviewing the firmware I also flagged hard-coded credentials. They belong in a separate config that is never committed, and the old tokens should be rotated.</p>
+        <p class="log-sign">Takeaway: design for the peak, not the average, and measure it with a scope before trusting it.</p>
+      </article>
+
+      <article class="log-page">
+        <div class="log-meta"><span>LOG 01</span><span>THz metamaterial sensor · CST</span></div>
+        <h3>How the sensor design evolved: D1 to D4</h3>
+        <p><b>D1.</b> A plain square ring resonator, which gave resonances near 3.8 THz and 4.5 THz. Two peaks, so no clean sensing line yet.</p>
+        <p><b>D2.</b> I cut discontinuities into the conductive path. That changes the effective inductance and capacitance, which moves and reshapes the peaks.</p>
+        <p><b>D3.</b> I connected diagonal elements to the outer loop, which nudged the resonance slightly.</p>
+        <p><b>D4.</b> Two diagonal paths tie into the outer loop. The current path gets longer, so the 4.5 THz resonance moves down to <b>3.892 THz</b>, and the absorption there improves. The final quality factor is about 30.22.</p>
+        <p><b>Tuning the material.</b> Raising the GaAs conductivity raises the absorption peak, and it gets close to 1 near 7×10<sup>5</sup> S/m, while the band narrows a little and shifts up slightly.</p>
+        <p><b>Using it.</b> A soil sample changes the surrounding permittivity, which shifts the peak. With Topp's equation, soil moisture of 1 % to 40 % maps to a permittivity of about 2.3 up to 24.96.</p>
+        <p class="log-sign">Takeaway: every geometry change is an L or C change. Think in current paths, then confirm in the simulator.</p>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- =====================================================
+       04.2 — LAB BENCH: live instruments (scope, antenna, skill graph, GitHub feed)
+       Code for these lives in the "lab" script at the bottom of the page.
+       ===================================================== -->
+  <section class="block reveal" id="lab">
+    <div class="block-head"><span class="desig">04.2</span><h2>Lab Bench</h2></div>
+    <p class="lab-note">Live instruments, not screenshots. Move the mouse over the scope, pull a node, watch the git log.</p>
+    <div class="lab-grid">
+      <div class="lab-card">
+        <h3>Oscilloscope · anomaly detector <span class="lab-tag">TinyTapeout</span></h3>
+        <canvas id="scope" height="210" aria-label="Oscilloscope showing a noisy input and its moving average"></canvas>
+        <div class="lab-ctl">
+          <span>Move over scope: x = frequency, y = amplitude</span>
+          <button type="button" class="chip-btn" id="scopeSpike">Inject anomaly</button>
+        </div>
+        <div class="lab-read" id="scopeRead">CH1 input · CH2 8-sample moving average · flag when |in − avg| &gt; threshold</div>
+      </div>
+      <div class="lab-card">
+        <h3>Git activity <span class="lab-tag" id="ghStamp">connecting…</span></h3>
+        <div class="gwin" role="region" aria-label="Recent GitHub activity">
+          <div class="gwin-bar"><i></i><i></i><i></i><span>sudarshan@github: ~/activity</span></div>
+          <div class="gwin-body" id="ghFeed"><span class="g-dim">$ git log --all --oneline</span></div>
+        </div>
+      </div>
+      <div class="lab-card wide">
+        <h3>How the THz sensor works <span class="lab-tag">drag the moisture slider</span></h3>
+        <canvas id="thzx" height="270" aria-label="Terahertz sensor layers and how the absorption peak shifts with soil moisture"></canvas>
+        <div class="lab-ctl">
+          <label>Soil moisture (VWC) <input type="range" id="thzxV" min="1" max="40" step="0.5" value="1"> <b id="thzxVv">1 %</b></label>
+          <label>Sensitivity (illustrative) <input type="range" id="thzxS" min="50" max="300" step="5" value="150"> <b id="thzxSv">150 GHz/RIU</b></label>
+        </div>
+        <div class="lab-read" id="thzxRead"></div>
+        <ol class="how">
+          <li><b>Resonator.</b> The patterned GaAs layer on aluminium and a 50 µm polyimide base absorbs a THz wave strongly at one frequency, 3.892 THz, with Q = 30.22.</li>
+          <li><b>Soil changes the electric field.</b> Wet soil has a much higher permittivity than dry soil (water is about 80, dry minerals 3 to 5). Topp's equation links moisture to permittivity, and the paper's table runs from 2.3 at 1 % VWC to 24.96 at 40 %.</li>
+          <li><b>The peak moves.</b> The extra permittivity adds capacitance, so the resonance shifts. Reading the new peak frequency tells you the moisture, with no soil sampling.</li>
+        </ol>
+        <p class="lab-fine">The Topp curve is matched to the paper's table end points. The size of the shift (sensitivity) is an illustrative slider, not exported CST data.</p>
+      </div>
+      <div class="lab-card wide">
+        <h3>How the tunable dual-band FSS works <span class="lab-tag">varactor + graphene</span></h3>
+        <canvas id="fssx" height="290" aria-label="Frequency selective surface layers and its reflection spectrum"></canvas>
+        <div class="lab-ctl">
+          <label>Varactor C <input type="range" id="fssxC" min="0.2" max="1.1" step="0.01" value="0.2"> <b id="fssxCv">0.20 pF</b></label>
+          <label>Graphene µc <input type="range" id="fssxG" min="0.07" max="0.33" step="0.01" value="0.17"> <b id="fssxGv">0.17 eV</b></label>
+          <label>Probe wave <input type="range" id="fssxF" min="1" max="7" step="0.01" value="5.1"> <b id="fssxFv">5.10 GHz</b></label>
+        </div>
+        <div class="lab-read" id="fssxRead"></div>
+        <ol class="how">
+          <li><b>Absorber.</b> A resonant layer sits above a ground plane. Energy that is neither reflected nor stored is burnt in the lossy parts (the 5000 Ω/sq sheet), so reflection drops to almost zero at the resonances.</li>
+          <li><b>Varactors set the frequency.</b> Raising the varactor capacitance from 0.2 to 1.1 pF slides band 1 from 2.785 to 1.679 GHz and band 2 from 6.180 to 5.011 GHz. The two bands change width in opposite directions.</li>
+          <li><b>Graphene sets the depth.</b> The graphene capacitor changes the layer's resistance. Band 1 is matched best near 0.17 eV and band 2 near 0.07 eV, so one band can be pushed deep while the other is held back.</li>
+        </ol>
+        <p class="lab-fine">Band positions and widths use the end points from the report (Table 4.1) and depths follow its Tables 4.2 and Section 4.3. Values in between are interpolated with a simple dip model, so this is a teaching model, not a CST export.</p>
+      </div>
+      <div class="lab-card wide">
+        <h3>3D chip viewer <span class="lab-tag" id="chipTag">tt_um_anomaly_detector · SKY130 · real GDS</span></h3>
+        <canvas id="chip3d" height="420" aria-label="Rotatable 3D view of the chip layout, built from the real GDS layers"></canvas>
+        <div class="lab-ctl">
+          <span>Drag to rotate</span>
+          <button type="button" class="chip-btn" id="chipSpin">Auto-spin: on</button>
+          <button type="button" class="chip-btn" id="chipExplode">Explode layers</button>
+          <button type="button" class="chip-btn" id="chipTop">Top view</button>
+        </div>
+        <div class="chip-legend" id="chipLegend" aria-label="Layer toggles"></div>
+        <div class="lab-read" id="chipNote"></div>
+        <div class="chip-stats" aria-label="Measured results from the OpenLane run">
+          <div><span class="k">Std cells</span><span class="v">677</span><span class="s">474 logic + 203 tap</span></div>
+          <div><span class="k">Flip-flops</span><span class="v">56</span><span class="s">sequential cells</span></div>
+          <div><span class="k">Filler cells</span><span class="v">2,431</span><span class="s">density fill</span></div>
+          <div><span class="k">Placement util.</span><span class="v">40.9%</span><span class="s">std-cell area / core</span></div>
+          <div><span class="k">Routed wire</span><span class="v">9,449 µm</span><span class="s">0 DRC errors</span></div>
+          <div><span class="k">Setup slack</span><span class="v">+64.6 ns</span><span class="s">worst corner (ss, 100 °C)</span></div>
+          <div><span class="k">DRC · LVS</span><span class="v">0 · 0</span><span class="s">Magic + KLayout + LVS</span></div>
+          <div><span class="k">Antenna</span><span class="v">0</span><span class="s">violating nets</span></div>
+        </div>
+        <div class="lab-read" style="margin-top:8px">Rendered from <code>tt_um_anomaly_detector.gds</code> with KLayout. Metrics from the OpenLane <code>metrics.csv</code> of the final run. Layer 5 (met5) is unused in this macro, so it is not drawn.</div>
+      </div>
+      <div class="lab-card wide">
+        <h3>Skill graph <span class="lab-tag">drag nodes · click a skill</span></h3>
+        <canvas id="graph" height="380" aria-label="Graph linking projects to the skills they used"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       04.4 — A DAY IN THE LAB: scroll-driven story (design, simulate, tape-out, field test)
+       The sticky stage is drawn by the "story" code in the lab script at the bottom of the page.
+       ===================================================== -->
+  <section class="block reveal" id="story">
+    <div class="block-head"><span class="desig">04.4</span><h2>A Day in the Lab</h2></div>
+    <p class="lab-note">Scroll slowly. One idea travels from design, to simulation, to silicon, to the field, with my own projects as the stops.</p>
+    <div class="story-wrap" id="storyWrap">
+      <div class="story-stick">
+        <div class="story-rail" id="storyRail" role="tablist" aria-label="Story stops">
+          <button type="button" data-s="0">1 Design</button><button type="button" data-s="1">2 Simulate</button><button type="button" data-s="2">3 Tape-out</button><button type="button" data-s="3">4 Field test</button>
+        </div>
+        <canvas id="storyc" aria-label="Animated walkthrough: resonator design, simulation, chip layout, robot field test"></canvas>
+        <div class="story-text" id="storyText" aria-live="polite"></div>
       </div>
     </div>
   </section>
@@ -1317,6 +1771,93 @@
 
 </div>
 
+<!-- =====================================================
+     DATASHEET (print only): the "Generate Datasheet" button and Ctrl+P print this page
+     instead of the website. It is hidden on screen; see the @media print rules in the style block.
+     ===================================================== -->
+<div id="datasheet" aria-hidden="true">
+  <div class="ds-top">
+    <div><div class="ds-pn">SV2027-ECE</div><div class="ds-sub">Hardware &amp; Embedded Systems Engineer · ASIC · RF · 5G Signalling</div></div>
+    <div class="ds-rev">REV. 2026<br>Chennai, Tamil Nadu</div>
+  </div>
+  <div class="ds-cols">
+    <div>
+      <h4>Features</h4>
+      <ul>
+        <li>Taped-out SKY130 ASIC through TinyTapeout: moving-average anomaly detector, 186.3 µW at nominal conditions</li>
+        <li>Terahertz metamaterial sensor: 3.892 THz resonance, Q = 30.22, soil-moisture sensing</li>
+        <li>Tunable dual-band FSS absorber (varactor + graphene): 1.64–3.12 GHz and 4.73–6.32 GHz</li>
+        <li>5G core signalling: NGAP/NAS codecs in pure Python with hand-written APER encoding</li>
+        <li>TDMA schedule planner with EMANE, MATLAB and ns-3 simulation</li>
+        <li>IoT rescue robot: ESP32-CAM video, MQ-135 gas sensor and INMP441 I2S microphone</li>
+      </ul>
+      <h4>Description</h4>
+      <p>Electronics and Communication Engineering student with hands-on experience in embedded systems, PCB design, RF and antenna engineering, digital hardware design and wireless communication. Experienced in IP design and verification through a taped-out SKY130 ASIC, with proficiency in Verilog HDL and testbench-based verification.</p>
+      <h4>Typical Applications</h4>
+      <ul>
+        <li>RF, antenna and metamaterial sensing</li>
+        <li>ASIC design and verification</li>
+        <li>5G core network signalling (Layer 2/3)</li>
+        <li>Wireless MAC scheduling (TDMA)</li>
+        <li>Embedded systems and IoT</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Absolute Maximum Ratings</h4>
+      <table>
+        <tr><th>Parameter</th><th>Rating</th></tr>
+        <tr><td>Spectrum simulated</td><td>GHz (FSS) up to 3.892 THz</td></tr>
+        <tr><td>Process node taped out</td><td>SKY130 (130 nm)</td></tr>
+        <tr><td>Protocols implemented</td><td>NGAP, NAS (APER)</td></tr>
+        <tr><td>Simulators</td><td>CST, ADS, ns-3, EMANE, LTspice</td></tr>
+        <tr><td>Projects delivered or in progress</td><td>6</td></tr>
+        <tr><td>Certifications</td><td>9</td></tr>
+      </table>
+      <h4>Recommended Operating Conditions</h4>
+      <table>
+        <tr><td>Availability</td><td>Hardware engineering internships and collaborations</td></tr>
+        <tr><td>Location</td><td>Chennai, Tamil Nadu (open to relocate)</td></tr>
+        <tr><td>Languages</td><td>Tamil (native), English (fluent), German (A2), Hindi (basic)</td></tr>
+        <tr><td>Languages (code)</td><td>Python, C, C++, Verilog HDL, Bash, MATLAB</td></tr>
+      </table>
+      <h4>Electrical Characteristics</h4>
+      <table>
+        <tr><th>Parameter</th><th>Value</th></tr>
+        <tr><td>THz sensor resonance / Q</td><td>3.892 THz / 30.22</td></tr>
+        <tr><td>ASIC power</td><td>186.3 µW</td></tr>
+        <tr><td>FSS angular stability</td><td>45° TE, 60° TM</td></tr>
+        <tr><td>B.E. ECE CGPA (5 semesters)</td><td>7.75</td></tr>
+        <tr><td>HSC</td><td>92 %</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="ds-cols">
+    <div>
+      <h4>Pin Configuration</h4>
+      <table>
+        <tr><td>1 · EMAIL</td><td>sudarshan060617@gmail.com</td></tr>
+        <tr><td>2 · PHONE</td><td>+91 90258 76308</td></tr>
+        <tr><td>3 · LINKEDIN</td><td>linkedin.com/in/sudarshan-veera8</td></tr>
+        <tr><td>4 · GITHUB</td><td>github.com/Sudarshan-veera</td></tr>
+        <tr><td>5 · WEB</td><td>sudarshan.is-a.dev</td></tr>
+      </table>
+    </div>
+    <div>
+      <h4>Revision History</h4>
+      <table>
+        <tr><td>2023</td><td>B.E. ECE begins, College of Engineering, Guindy</td></tr>
+        <tr><td>2025</td><td>THz metamaterial sensor, ANGEL BOT rescue robot</td></tr>
+        <tr><td>2026</td><td>TinyTapeout ASIC, LoRa chat, BaSig Wireless internship, TDMA planner</td></tr>
+        <tr><td>2026</td><td>Final-year project: tunable dual-band FSS (in progress)</td></tr>
+      </table>
+      <h4>Ordering Information</h4>
+      <p>SV2027-ECE-INTERN · contact the address in Pin 1.</p>
+    </div>
+  </div>
+  <div class="ds-foot">SV2027-ECE · Rev. 2026 · sudarshan.is-a.dev · Specifications are results from simulation and coursework as described on the website.</div>
+</div>
+
+
 <!-- Back-to-top button (shown after scrolling down) -->
 <button class="totop" id="totop" aria-label="Back to top">↑</button>
 
@@ -1335,6 +1876,454 @@
 <!-- Small message that pops up at the bottom (copy confirmations, etc.) -->
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<!-- =====================================================================
+     SWARM ENGINE  (marker: sv-swarm-engine)
+     A small crowd of labelled cursors "builds" the page in front of the visitor:
+     they drag boxes (crosshair), type text (I-beam), trace the waveform (pen) and
+     drop alignment guides, then flock to the real mouse pointer. Further sections
+     are built as you scroll (more cursors when you scroll faster).
+     It never changes content: every element is only hidden (opacity) until a cursor
+     reveals it, and Skip / Esc / printing reveals everything instantly.
+     Keys: Esc skip - Alt+Shift+S replay - M sound.  URL: ?swarm=off disables, ?swarm=1 forces.
+     ===================================================================== -->
+<script>
+/* sv-swarm-engine */
+window.SVSwarm = { whenRevealed:function(el,cb){cb();}, replay:function(){}, skip:function(){}, active:function(){return false;} };
+(function(){
+try{
+var doc=document, root=doc.documentElement;
+var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+var forceOff=/[?&]swarm=off/.test(location.search);
+if(forceOff){root.classList.remove('sw-boot');return;}
+var CANCEL={cancel:1};
+var $=function(s,r){return (r||doc).querySelector(s);}, $$=function(s,r){return Array.prototype.slice.call((r||doc).querySelectorAll(s));};
+var clamp=function(v,a,b){return Math.max(a,Math.min(b,v));};
+var ease=function(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;};
+
+/* ---------- units: the pieces the swarm builds, in document order ---------- */
+var SEL='.sheet > header.frame, .hero > *, section.block > .block-head > *, section.block > :not(.block-head), .sheet > footer.frame > *';
+var units=$$(SEL).map(function(el){return {el:el,claimed:false,done:false,texts:null,kind:'box'};});
+if(!units.length){root.classList.remove('sw-boot');return;}
+var isTypeable=function(el){
+  if(el.querySelector('a,button,input,textarea,img,svg,canvas,form,table,ul,ol')) return false;
+  var t=(el.textContent||'').trim();
+  return t.length>1 && t.length<=240;
+};
+units.forEach(function(u){
+  var el=u.el;
+  if(el.classList.contains('waveform')) u.kind='pen';
+  else if(el.matches('h1,h2,.part-no,.tagline,p,.desig') && isTypeable(el)) u.kind='type';
+  else u.kind='box';
+});
+
+/* ---------- state ---------- */
+var run=0, S=1, muted=true, introPhase=true, busy=0, ending=false, flocking=false, finished=false, started=false;
+var mouse={x:innerWidth/2,y:innerHeight*0.55}, speedEMA=0, lastY=scrollY, lastT=performance.now();
+var hooks=[];
+var COLORS=[['VERILOG','#B5650B'],['RF','#2F6FB5'],['EMBEDDED','#2E8B57'],['5G','#B5457A'],['PYTHON','#7A5FC4'],['PCB','#C28A00']];
+
+/* ---------- DOM layer ---------- */
+var layer=doc.createElement('div'); layer.className='sw-layer'; layer.setAttribute('aria-hidden','true'); doc.body.appendChild(layer);
+var trail=doc.createElement('canvas'); trail.style.cssText='position:absolute;inset:0;width:100%;height:100%'; layer.appendChild(trail);
+var tctx=trail.getContext('2d'), trailOn=false;
+function trailLoop(){
+  if(!trailOn) { tctx.clearRect(0,0,trail.width,trail.height); return; }
+  var dpr=Math.min(2,devicePixelRatio||1), w=innerWidth, h=innerHeight;
+  if(trail.width!==w*dpr||trail.height!==h*dpr){trail.width=w*dpr;trail.height=h*dpr;}
+  tctx.setTransform(dpr,0,0,dpr,0,0); tctx.clearRect(0,0,w,h);
+  var now=performance.now();
+  agents.forEach(function(a){
+    if(!a.tr||a.el.classList.contains('idle')) return;
+    a.tr=a.tr.filter(function(p){return now-p.t<420;});
+    tctx.strokeStyle=a.el.style.color; tctx.lineCap='round';
+    for(var i=1;i<a.tr.length;i++){ var p=a.tr[i], q=a.tr[i-1]; tctx.globalAlpha=Math.max(0,.55*(1-(now-p.t)/420)); tctx.lineWidth=2.2; tctx.beginPath(); tctx.moveTo(q.x,q.y); tctx.lineTo(p.x,p.y); tctx.stroke(); }
+  });
+  tctx.globalAlpha=1; requestAnimationFrame(trailLoop);
+}
+/* ---------- boot (POST) screen ---------- */
+var postEl=null;
+async function post(tok){
+  postEl=doc.createElement('div'); postEl.className='sw-post'; doc.body.appendChild(postEl);
+  var L=['<b>SV-BIOS</b> v2026.11   (c) Sudarshan V','CPU: ECE B.E. 2027 @ CEG ........ CGPA 7.75','RF front-end ................... OK','ASIC (SKY130 tape-out) ......... OK','5G NGAP/NAS stack .............. OK','Embedded I/O (ESP32, STM32) .... OK','','Loading page… the swarm is rebuilding it_'];
+  for(var i=0;i<L.length;i++){ postEl.innerHTML+=L[i]+'\n'; blip(900,.015,.01); await sleep(i===L.length-1?380:110,tok); }
+  postEl.classList.add('out'); var pe=postEl; setTimeout(function(){pe.remove();},500); postEl=null;
+}
+var ICONS=
+ '<svg class="i-arrow" width="20" height="22" viewBox="0 0 20 22"><path d="M1 1v15l4-3.6 3 7 2.6-1.2-3-6.8h5.6z" fill="currentColor" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/></svg>'+
+ '<svg class="i-cross" width="22" height="22" viewBox="0 0 22 22"><path d="M11 1v20M1 11h20" stroke="#fff" stroke-width="3"/><path d="M11 1v20M1 11h20" stroke="currentColor" stroke-width="1.3"/></svg>'+
+ '<svg class="i-ibeam" width="12" height="22" viewBox="0 0 12 22"><path d="M2 2h8M2 20h8M6 2v18" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/><path d="M2 2h8M2 20h8M6 2v18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>'+
+ '<svg class="i-pen" width="20" height="22" viewBox="0 0 20 22"><path d="M1 21l1-5L14 4l4 4L6 20z" fill="currentColor" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/></svg>';
+var agents=COLORS.map(function(c,i){
+  var el=doc.createElement('div'); el.className='sw-cur idle'; el.dataset.m='arrow'; el.style.color=c[1];
+  el.innerHTML=ICONS+'<span class="sw-tag" style="background:'+c[1]+'">'+c[0]+'</span>';
+  layer.appendChild(el);
+  var a={el:el,x:-50,y:-50,i:i,box:null};
+  place(a,innerWidth*(0.2+0.12*i),-40);
+  return a;
+});
+function place(a,x,y){a.x=x;a.y=y;(a.tr||(a.tr=[])).push({x:x,y:y,t:performance.now()}); if(a.tr.length>40) a.tr.shift();a.el.style.transform='translate3d('+x.toFixed(1)+'px,'+y.toFixed(1)+'px,0)';}
+function setMode(a,m){a.el.dataset.m=m;}
+function idle(a){a.el.classList.add('idle');}
+function unidle(a){a.el.classList.remove('idle');}
+
+function mkBox(a){
+  if(a.box) return a.box;
+  var b=doc.createElement('div'); b.className='sw-box'; b.style.display='none';
+  b.innerHTML='<i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i><b></b>';
+  layer.appendChild(b); a.box=b; return b;
+}
+function guide(y,vertical,x){
+  var g=doc.createElement('div'); g.className='sw-guide'+(vertical?' v':'');
+  if(vertical) g.style.left=x+'px'; else g.style.top=y+'px';
+  layer.appendChild(g);
+  var an=g.animate([{opacity:1},{opacity:1,offset:.6},{opacity:0}],{duration:900/S,easing:'ease-out'});
+  an.onfinish=function(){g.remove();};
+}
+
+/* ---------- timing helpers (all cancellable) ---------- */
+function alive(tok){ if(tok!==run) throw CANCEL; }
+function sleep(ms,tok){return new Promise(function(res,rej){setTimeout(function(){tok===run?res():rej(CANCEL);},ms/effS());});}
+function effS(){ var f=1+Math.min(2,curSpeed()/1500); return S*(introPhase?1:f); }
+function curSpeed(){ var dt=performance.now()-lastT; return speedEMA*Math.exp(-dt/450); }
+function anim(ms,fn,tok){
+  return new Promise(function(res,rej){
+    var t0=performance.now(), d=ms/effS();
+    (function f(now){
+      if(tok!==run) return rej(CANCEL);
+      var p=d<=0?1:clamp((now-t0)/d,0,1);
+      try{fn(p);}catch(e){return rej(e);}
+      p<1?requestAnimationFrame(f):res();
+    })(t0);
+  });
+}
+function moveTo(a,get,ms,tok){
+  var sx=a.x, sy=a.y, off=(Math.random()-.5)*90;
+  return anim(ms,function(p){
+    var e=ease(p), t=get(), bend=Math.sin(Math.PI*e)*off;
+    place(a, sx+(t.x-sx)*e+bend*.6, sy+(t.y-sy)*e-bend*.4);
+  },tok);
+}
+
+/* ---------- geometry ---------- */
+function vis(el){
+  var r=el.getBoundingClientRect(), vh=innerHeight, vw=innerWidth;
+  var top=Math.max(r.top,10), bot=Math.min(r.bottom,vh-10), left=Math.max(r.left,6), right=Math.min(r.right,vw-6);
+  if(bot<top+4) bot=top+4; if(right<left+4) right=left+4;
+  return {l:left,t:top,r:right,b:bot,w:right-left,h:bot-top,full:r};
+}
+
+/* ---------- sound (off until M / the button; needs a user gesture anyway) ---------- */
+var ac=null;
+function blip(f,d,v,type,slide){
+  if(muted||!ac) return;
+  try{
+    var o=ac.createOscillator(), g=ac.createGain(), t=ac.currentTime;
+    o.type=type||'square'; o.frequency.setValueAtTime(f,t); if(slide) o.frequency.exponentialRampToValueAtTime(slide,t+d);
+    g.gain.setValueAtTime(v||.015,t); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t+d+.02);
+  }catch(e){}
+}
+var lastTick=0;
+function tick(){var n=performance.now(); if(n-lastTick<45) return; lastTick=n; blip(700+Math.random()*500,.02,.01,'square');}
+function setSound(on){
+  muted=!on;
+  if(on&&!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}
+  if(on&&ac&&ac.state==='suspended') ac.resume();
+  hudSound.textContent=on?'♪ on':'♪ off'; hudSound.setAttribute('aria-pressed',on?'true':'false');
+  if(on) blip(520,.12,.03,'triangle',780);
+}
+
+/* ---------- reveal ---------- */
+function show(u,animated){
+  var el=u.el;
+  if(!el.classList.contains('sw-hide')){u.done=true;return;}
+  u.done=true;
+  el.classList.remove('sw-hide');
+  if(animated!==false && !reduce && el.animate){
+    el.animate([{opacity:0,transform:'translateY(10px) scale(.992)'},{opacity:1,transform:'none'}],{duration:380/effS(),easing:'cubic-bezier(.2,.7,.2,1)',fill:'backwards'});
+  }
+  flushHooks();
+}
+function restoreText(u){
+  if(!u.texts) return;
+  u.texts.forEach(function(t){t.n.nodeValue=t.s;});
+}
+function flushHooks(){
+  hooks=hooks.filter(function(h){
+    if(h.el.closest('.sw-hide')) return true;
+    try{h.cb();}catch(e){console.error(e);}
+    return false;
+  });
+}
+
+/* ---------- builders ---------- */
+async function buildBox(a,u,tok){
+  var el=u.el, b=mkBox(a), lab=$('b',b);
+  setMode(a,'arrow');
+  await moveTo(a,function(){var v=vis(el);return {x:v.l-6,y:v.t-6};},520,tok);
+  setMode(a,'cross');
+  await sleep(90,tok);
+  b.style.display='block'; blip(300,.05,.02);
+  await anim(Math.min(900,380+vis(el).w*.45),function(p){
+    var v=vis(el), e=ease(p), w=Math.max(2,v.w*e), h=Math.max(2,v.h*e);
+    b.style.left=v.l+'px'; b.style.top=v.t+'px'; b.style.width=w+'px'; b.style.height=h+'px';
+    lab.style.top=v.t<28?'2px':'';
+    lab.textContent=Math.round(v.full.width*e)+' × '+Math.round(v.full.height*e);
+    place(a,v.l+w,v.t+h);
+    if(p<1) tick();
+  },tok);
+  blip(180,.09,.025,'triangle',120);
+  show(u,true);
+  if(vis(el).h>70){var v=vis(el); guide(v.t,false); guide(v.b,false); if(Math.random()<.4) guide(0,true,v.l);}
+  var bx=b; var fade=bx.animate([{opacity:1},{opacity:0}],{duration:420/effS(),fill:'forwards'});
+  fade.onfinish=function(){bx.style.display='none'; fade.cancel();};
+  setMode(a,'arrow');
+}
+async function buildType(a,u,tok){
+  var el=u.el;
+  var walker=doc.createTreeWalker(el,NodeFilter.SHOW_TEXT,null), list=[], n;
+  while((n=walker.nextNode())) if(n.nodeValue.trim()) list.push({n:n,s:n.nodeValue});
+  if(!list.length){ show(u,false); return; }
+  u.texts=list; list.forEach(function(t){t.n.nodeValue='';});
+  setMode(a,'arrow');
+  await moveTo(a,function(){var v=vis(el);return {x:v.l+2,y:v.t+Math.min(v.h/2,18)};},480,tok);
+  setMode(a,'ibeam');
+  el.classList.remove('sw-hide');           // text is empty, so nothing shows yet
+  var total=list.reduce(function(s,t){return s+t.s.length;},0);
+  var perMs=total>90?10:total>40?20:34, typed=0, range=doc.createRange();
+  var t0=performance.now();
+  await anim(total*perMs,function(p){
+    var target=Math.round(total*p);
+    while(typed<target){
+      typed++;
+      var left=typed, k=0;
+      for(;k<list.length;k++){ if(left>list[k].s.length) {list[k].n.nodeValue=list[k].s; left-=list[k].s.length;} else {list[k].n.nodeValue=list[k].s.slice(0,left); k++; break;} }
+      tick();
+    }
+    var cur=null; for(var j=list.length-1;j>=0;j--){ if(list[j].n.nodeValue.length){cur=list[j]; break;} }
+    if(cur){
+      try{range.setStart(cur.n,cur.n.nodeValue.length); range.setEnd(cur.n,cur.n.nodeValue.length);
+        var rc=range.getClientRects()[0]||range.getBoundingClientRect();
+        if(rc&&(rc.height||rc.width)) place(a,rc.right+1,rc.top+rc.height/2);}catch(e){}
+    }
+  },tok);
+  list.forEach(function(t){t.n.nodeValue=t.s;});
+  u.texts=null; u.done=true; flushHooks();
+  setMode(a,'arrow');
+}
+async function buildPen(a,u,tok){
+  var el=u.el, svgNS='http://www.w3.org/2000/svg';
+  var host=$('svg',el)||el, line=$('polyline',el);
+  var raw=(line&&line.getAttribute('points')||'').trim().split(/\s+/).map(function(s){var q=s.split(',');return [parseFloat(q[0]),parseFloat(q[1])];}).filter(function(q){return isFinite(q[0])&&isFinite(q[1]);});
+  var vb=(host.getAttribute&&host.getAttribute('viewBox')||'0 0 600 40').split(/\s+/).map(Number);
+  if(raw.length<2){ await buildBox(a,u,tok); return; }
+  var maxX=raw[raw.length-1][0]||vb[2];
+  function geom(){ var r=host.getBoundingClientRect(); return {l:r.left,t:r.top,w:r.width,h:r.height}; }
+  function ptAt(prog){                    // point on the real polyline at fraction of its x range
+    var X=prog*maxX, i=1; while(i<raw.length-1&&raw[i][0]<X) i++;
+    var p0=raw[i-1], p1=raw[i], k=p1[0]===p0[0]?0:clamp((X-p0[0])/(p1[0]-p0[0]),0,1);
+    return [X,p0[1]+(p1[1]-p0[1])*k];
+  }
+  function toScreen(q){ var g=geom(); return {x:g.l+q[0]/vb[2]*g.w, y:g.t+(q[1]-vb[1])/vb[3]*g.h}; }
+  setMode(a,'arrow');
+  await moveTo(a,function(){return toScreen(raw[0]);},480,tok);
+  setMode(a,'pen');
+  var s=doc.createElementNS(svgNS,'svg'); s.setAttribute('style','position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible');
+  var pl=doc.createElementNS(svgNS,'polyline'); pl.setAttribute('fill','none'); pl.setAttribute('stroke','currentColor'); pl.setAttribute('stroke-width','2'); pl.setAttribute('stroke-linejoin','round'); pl.setAttribute('stroke-linecap','round'); pl.style.color='var(--copper)';
+  s.appendChild(pl); layer.appendChild(s);
+  try{
+    await anim(1500,function(p){
+      var X=p*maxX, drawn=[], i;
+      for(i=0;i<raw.length&&raw[i][0]<=X;i++){ var q=toScreen(raw[i]); drawn.push(q.x.toFixed(1)+','+q.y.toFixed(1)); }
+      var tip=toScreen(ptAt(p)); drawn.push(tip.x.toFixed(1)+','+tip.y.toFixed(1));
+      pl.setAttribute('points',drawn.join(' ')); place(a,tip.x,tip.y); tick();
+    },tok);
+  }finally{
+    var sv=s, f=sv.animate([{opacity:1},{opacity:0}],{duration:450,fill:'forwards'}); f.onfinish=function(){sv.remove();};
+  }
+  show(u,true);
+  setMode(a,'arrow');
+}
+async function build(a,u,tok){
+  u.claimed=true; busy++;
+  try{
+    if(u.kind==='type') await buildType(a,u,tok);
+    else if(u.kind==='pen') await buildPen(a,u,tok);
+    else await buildBox(a,u,tok);
+  }finally{ busy--; }
+  if(tok===run && !u.done){ restoreText(u); show(u,false); }
+}
+
+/* ---------- scheduling ---------- */
+function pickUnit(){
+  var vh=innerHeight;
+  for(var i=0;i<units.length;i++){
+    var u=units[i]; if(u.claimed) continue;
+    var r=u.el.getBoundingClientRect();
+    if(r.width===0&&r.height===0){u.claimed=true; show(u,false); continue;}   // not rendered (display:none)
+    if(r.bottom<-vh*0.5){u.claimed=true; show(u,false); continue;}              // scrolled far past: just show it
+    if(r.top<vh*0.96 && r.bottom>0) return u;
+  }
+  return null;
+}
+function wanted(){
+  if(introPhase) return S>1?4:3;
+  return clamp(2+Math.floor(curSpeed()/900),2,6);
+}
+async function worker(i,tok){
+  var a=agents[i];
+  while(tok===run){
+    try{
+      if(flocking){ await sleep(100,tok); continue; }
+      if(i>=wanted()){ idle(a); await sleep(150,tok); continue; }
+      var u=pickUnit();
+      if(!u){ idle(a); await sleep(130,tok); checkEnd(tok); continue; }
+      unidle(a);
+      await build(a,u,tok);
+    }catch(e){
+      if(e===CANCEL) return;
+      console.error('swarm',e); finish(); return;
+    }
+  }
+}
+function allDone(){return units.every(function(u){return u.done;});}
+function checkEnd(tok){
+  if(tok!==run||ending||busy>0) return;
+  if(allDone()){ ending=true; complete(tok); return; }
+  if(introPhase && !pickUnit()){ ending=true; finale(tok).then(function(){ending=false;}).catch(function(){ending=false;}); }
+}
+async function finale(tok){
+  flocking=true;
+  var n=Math.min(4,agents.length);
+  try{
+    for(var i=0;i<n;i++){ unidle(agents[i]); setMode(agents[i],'arrow'); }
+    var ang=Math.random()*6.28;
+    await Promise.all(agents.slice(0,n).map(function(a,i){
+      var o=(i/n)*6.28+ang;
+      return moveTo(a,function(){return {x:mouse.x+Math.cos(o)*34,y:mouse.y+Math.sin(o)*34};},850,tok);
+    }));
+    blip(440,.15,.03,'triangle',660);
+    await anim(900,function(p){
+      agents.slice(0,n).forEach(function(a,i){
+        var o=(i/n)*6.28+ang+p*5, r=34*(1-p*.6);
+        place(a,mouse.x+Math.cos(o)*r+(Math.random()-.5),mouse.y+Math.sin(o)*r+(Math.random()-.5));
+      });
+    },tok);
+  }finally{
+    agents.forEach(idle);
+    flocking=false; introPhase=false;
+    try{sessionStorage.setItem('sv-swarm-done','1');}catch(e){}
+    setHud('scroll');
+  }
+}
+function complete(tok){
+  agents.forEach(idle);
+  setTimeout(function(){ if(tok===run) finish(); },500);
+}
+
+/* ---------- start / finish / replay ---------- */
+function resetUnits(){
+  units.forEach(function(u){
+    restoreText(u); u.texts=null; u.claimed=false; u.done=false; u.el.classList.add('sw-hide');
+  });
+}
+function start(replay){
+  run++; var tok=run;
+  finished=false; ending=false; flocking=false; busy=0; introPhase=true; started=true;
+  resetUnits();
+  $$('.reveal').forEach(function(e){e.classList.add('in');});
+  $$('.sw-box,.sw-guide',layer).forEach(function(e){e.style.display='none';});
+  agents.forEach(function(a){setMode(a,'arrow'); a.el.classList.remove('idle'); place(a,innerWidth/2,innerHeight/2);});
+  root.classList.add('sw-run'); root.classList.remove('sw-boot');
+  if(postEl){postEl.remove();postEl=null;}
+  trailOn=true; requestAnimationFrame(trailLoop);
+  setHud('run');
+  if(replay) window.scrollTo(0,0);
+  (async function(){
+    try{
+      if(!replay) await post(tok);
+      var cx=innerWidth/2, cy=Math.min(innerHeight*0.42,320), n=agents.length;
+      await anim(1250,function(p){
+        agents.forEach(function(a,i){
+          var o=(i/n)*6.28+p*7.5, r=30+ease(p<.5?p*2:2-p*2)*70;
+          place(a,cx+Math.cos(o)*r,cy+Math.sin(o)*r*.7);
+        });
+        if(p<1&&Math.random()<.12) blip(300+p*500,.03,.008);
+      },tok);
+      for(var i=0;i<n;i++) worker(i,tok);
+    }catch(e){ if(e!==CANCEL){console.error(e); finish();} }
+  })();
+}
+function finish(){
+  run++; finished=true; busy=0; ending=false; flocking=false; introPhase=false;
+  units.forEach(function(u){restoreText(u); u.texts=null; u.done=true; u.claimed=true; u.el.classList.remove('sw-hide');});
+  $$('.sw-box,.sw-guide',layer).forEach(function(e){e.remove();});
+  agents.forEach(function(a){a.box=null; idle(a);});
+  root.classList.remove('sw-run','sw-boot'); trailOn=false;
+  if(postEl){postEl.remove();postEl=null;} $$('.sw-post').forEach(function(e){e.remove();});
+  try{sessionStorage.setItem('sv-swarm-done','1');}catch(e){}
+  setHud('idle'); flushHooks();
+}
+
+/* ---------- HUD ---------- */
+var hud=doc.createElement('div'); hud.className='sw-hud idle'; hud.setAttribute('role','group'); hud.setAttribute('aria-label','Page build controls');
+hud.innerHTML='<span class="sw-st"></span><button type="button" data-a="speed" title="Build speed">1×</button><button type="button" data-a="sound" aria-pressed="false" title="Sound (M)">♪ off</button><button type="button" data-a="skip" title="Skip (Esc)">Skip</button><button type="button" data-a="replay" title="Replay the build (Alt+Shift+S)">↻ Replay</button>';
+doc.body.appendChild(hud);
+var hudSt=$('.sw-st',hud), hudSound=$('[data-a=sound]',hud), hudSpeed=$('[data-a=speed]',hud);
+function setHud(mode){
+  hud.className='sw-hud '+(mode==='idle'?'idle':'run');
+  hudSt.textContent=mode==='scroll'?'swarm: building as you scroll':'swarm: building…';
+}
+hud.addEventListener('click',function(e){
+  var b=e.target.closest('button'); if(!b) return;
+  var a=b.dataset.a;
+  if(a==='speed'){ S=S===1?2:S===2?3:1; hudSpeed.textContent=S+'×'; }
+  else if(a==='sound') setSound(muted);
+  else if(a==='skip') finish();
+  else if(a==='replay') start(true);
+});
+
+/* ---------- input ---------- */
+addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;},{passive:true});
+addEventListener('touchstart',function(e){var t=e.touches[0]; if(t){mouse.x=t.clientX;mouse.y=t.clientY;}},{passive:true});
+addEventListener('scroll',function(){
+  var n=performance.now(), dt=Math.max(16,n-lastT), dy=Math.abs(scrollY-lastY);
+  var inst=dy/dt*1000; speedEMA=curSpeed()*.5+inst*.5; lastT=n; lastY=scrollY;
+},{passive:true});
+addEventListener('keydown',function(e){
+  var t=e.target, typing=t&&(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||t.isContentEditable);
+  if(e.key==='Escape'&&root.classList.contains('sw-run')) finish();
+  else if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='s'){e.preventDefault(); start(true);}
+  else if(!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&e.key.toLowerCase()==='m'&&root.classList.contains('sw-run')) setSound(muted);
+});
+addEventListener('beforeprint',function(){ if(!finished&&started) finish(); });
+addEventListener('hashchange',function(){ /* units in view get built by the scheduler */ });
+
+/* ---------- public API ---------- */
+window.SVSwarm={
+  whenRevealed:function(el,cb){ if(!el||!el.closest('.sw-hide')) cb(); else hooks.push({el:el,cb:cb}); },
+  replay:function(){start(true);},
+  skip:function(){finish();},
+  active:function(){return root.classList.contains('sw-run');}
+};
+
+/* ---------- go ---------- */
+var done=false; try{done=sessionStorage.getItem('sv-swarm-done')==='1';}catch(e){}
+var go=!reduce && (/[?&]swarm=1/.test(location.search) || !done);
+if(reduce){ doc.getElementById && (hud.style.display='none'); }
+if(go){
+  start(false);
+  setTimeout(function(){ if(!finished && introPhase===true && root.classList.contains('sw-run') && performance.now()>60000) finish(); },61000);
+}else{
+  root.classList.remove('sw-boot');
+}
+}catch(err){
+  console.error('swarm failed, showing the plain page',err);
+  try{ document.documentElement.classList.remove('sw-boot','sw-run'); $$('.sw-hide').forEach(function(e){e.classList.remove('sw-hide');}); }catch(e){}
+}
+function $$(s){return Array.prototype.slice.call(document.querySelectorAll(s));}
+})();
+</script>
 <script>
 /* ==========================================================================
    SCRIPT OVERVIEW
@@ -1423,8 +2412,9 @@ function setTheme(t){
 function toggleTheme(){
   setTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
 }
+/* dark is the default (the head script already set data-theme); a saved choice wins */
 const savedTheme = store.get('sv-theme');
-if(savedTheme) setTheme(savedTheme);
+setTheme(savedTheme === 'light' ? 'light' : 'dark');
 $('#themeToggle').addEventListener('click', toggleTheme);
 
 /* ----- Mobile menu ----- */
@@ -1483,6 +2473,9 @@ $$('[data-copy]').forEach(btn => {
   });
 });
 
+/* The swarm intro (see swarm script above) exposes window.SVSwarm; fall back to a no-op if it is missing */
+const SW = window.SVSwarm || { whenRevealed:(el, cb) => cb(), replay(){}, skip(){}, active:() => false };
+
 /* ----- Count-up numbers in the hero stats ----- */
 const statsEl = $('.stats');
 if(statsEl){
@@ -1500,8 +2493,10 @@ if(statsEl){
       })(t0);
     });
   }, { threshold: 0.4 });
-  countObserver.observe(statsEl);
+  SW.whenRevealed(statsEl, () => countObserver.observe(statsEl));   // wait until the swarm has built the stats
 }
+
+$('#dsBtn').addEventListener('click', () => window.print());   // print stylesheet swaps the site for the datasheet layout
 
 /* ----- "View Details" panels (height animates via CSS) ----- */
 $$('[data-toggle]').forEach(btn => {
@@ -1592,10 +2587,27 @@ let activeSkill = null;
 $$('.skill-chip').forEach(chip => {
   const used = skillTargets.some(t => t.dataset.skills.split('|').includes(chip.dataset.skill));
   chip.classList.toggle('has', used);
+  const n = skillTargets.filter(t => t.dataset.skills.split('|').includes(chip.dataset.skill)).length;
+  if(n) chip.insertAdjacentHTML('beforeend', '<span class="n" title="used in ' + n + ' place' + (n > 1 ? 's' : '') + '">' + n + '</span>');
+});
+// Skill pills inside each project / internship entry (built from its data-skills list)
+skillTargets.forEach(t => {
+  const host = t.classList.contains('datasheet-card') ? ($('.tag-row', t) || $('.ds-body', t)) : t.children[1];
+  if(!host) return;
+  const row = document.createElement('div'); row.className = 'sk-row';
+  row.innerHTML = '<span class="sk-lbl">SKILLS USED</span>' + t.dataset.skills.split('|')
+    .map(k => '<button type="button" class="sk-pill" data-skill="' + k + '">' + k + '</button>').join('');
+  if(t.classList.contains('datasheet-card') && host.classList.contains('tag-row')) host.after(row); else host.appendChild(row);
+  row.addEventListener('click', e => {
+    const b = e.target.closest('.sk-pill'); if(!b) return;
+    if(activeSkill !== b.dataset.skill) setSkill(b.dataset.skill);
+    $('#skillStatus').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+  });
 });
 function setSkill(skill){
   activeSkill = (activeSkill === skill) ? null : skill;
   $$('.skill-chip').forEach(c => c.classList.toggle('on', c.dataset.skill === activeSkill));
+  $$('.sk-pill').forEach(c => c.classList.toggle('on', c.dataset.skill === activeSkill));
   let hits = 0;
   skillTargets.forEach(t => {
     const uses = activeSkill && t.dataset.skills.split('|').includes(activeSkill);
@@ -1641,6 +2653,12 @@ const paletteItems = [
   { label: 'Open demo: LoRa token ring',    hint: 'demo', run: () => openDemo('ring') },
   { label: 'Open demo: ANGEL BOT dashboard',hint: 'demo', run: () => openDemo('bot') },
   { label: 'Open demo: NGAP byte explorer', hint: 'demo', run: () => openDemo('ngap') },
+  { label: 'Replay the swarm build (cursors rebuild the page)', hint: 'Alt+Shift+S', run: () => SW.replay() },
+  { label: 'Generate datasheet (print / save as PDF)', hint: 'action', run: () => window.print() },
+  { label: 'Power up contact chip (/hire-me)', hint: 'fun', run: () => openHire() },
+  { label: 'Go to A Day in the Lab (story)', hint: 'section', run: () => goTo('#story') },
+  { label: 'Go to Engineering Logbook', hint: 'section', run: () => goTo('#logbook') },
+  { label: 'Send Morse code: SOS', hint: 'fun', run: () => { goTo('.term'); setTimeout(() => print(sendMorse('sos')), 300); } },
   { label: 'Toggle light / dark theme',     hint: 'T',    run: toggleTheme },
   { label: 'Copy email address',            hint: 'action', run: copyEmail },
   { label: 'Open GitHub profile',           hint: 'link', run: () => window.open('https://github.com/Sudarshan-veera', '_blank', 'noopener') },
@@ -1722,9 +2740,25 @@ const COMMANDS = {
     '  email            copy my email',
     '  resume           open my resume',
     '  theme [dark|light]  switch theme',
+    '  /hire-me         power up the contact chip (animated)',
+    '  morse <text>     flash a message in Morse code on the LEDs',
+    '  sudo rm -rf /    just try it 😎',
+    '  neofetch, ping, sudo hire sudarshan, swarm, lab',
     '  ls, cat <file>, date, echo, clear',
-    'Also: Ctrl+K opens the command palette.'].join('\n'); },
+    'Also: Ctrl+K opens the command palette. Secret: try the Konami code.'].join('\n'); },
   whoami(){ return 'sudarshan-v'; },
+  neofetch(){ return [
+    '  ┌──────────┐   sudarshan@portfolio',
+    '  │ SV-CORE  │   ---------------------',
+    '  │  ░░▒▒▓▓  │   OS: SV-OS 1.0 (static, GitHub Pages)',
+    '  └──────────┘   Role: ECE student, hardware + 5G',
+    '                 Uptime: ' + Math.round(performance.now() / 1000) + 's',
+    '                 Shell: sv-sh (you are in it)',
+    '                 Silicon: SKY130 tape-out, 186.3 µW'].join('\n'); },
+  ping(args){ return 'PING ' + (args[0] || 'sudarshan') + ': 64 bytes, time=0.4 ms, status=open to internships\n(type "contact" to reach me)'; },
+  swarm(){ SW.replay(); return 'Replaying the swarm build ...'; },
+  lab(){ goTo('#lab'); return 'Scrolling to the lab bench ...'; },
+  history(){ return 'There is no history. Only the future (and git log).'; },
   about(){ return FILES['about.txt']; },
   skills(){ return 'Python, C, C++ | MATLAB, Simulink, CST, GNU Radio, LTspice, Altium, NS-3, Wireshark\nVS Code, GitHub, Arduino IDE, ESP-IDF, STM32CubeIDE, Docker, Linux'; },
   projects(){ return [
@@ -1732,6 +2766,8 @@ const COMMANDS = {
     '[tt]     TinyTapeout Anomaly Detector, SKY130 (2026)',
     '[lora]   LoRa Campus Chat, token passing (2026)',
     '[angel]  ANGEL BOT rescue robot (2025)',
+    '[fss]    Dual-band tunable FSS, final-year project (2026)',
+    '[tdma]   TDMA schedule planner, Vaan Megam (2026)',
     'Try: open tt'].join('\n'); },
   experience(){ return 'BaSig Wireless (2026): NGAP/NAS codecs for 5G core signaling in Python.\nTry: open ngap'; },
   education(){ return 'B.E. ECE, College of Engineering, Guindy, 2023-2027 (CGPA 7.75 through 5th sem).\nHSC, JG Hindu Vidyalaya, 2023 (92%).'; },
@@ -1753,10 +2789,136 @@ const COMMANDS = {
     const t = (args[0] || '').toLowerCase();
     if(t === 'contact'){ goTo('#contact'); return 'Scrolling to contact ...'; }
     if(t === 'skills'){ goTo('#skills'); return 'Scrolling to skills ...'; }
+    if(t === 'fss' || t === 'tdma'){ goTo('#project-' + t); return 'Scrolling to project: ' + t; }
+    if(t === 'logbook'){ goTo('#logbook'); return 'Opening the engineering logbook ...'; }
     if(OPEN_TARGETS[t]){ openDemo(OPEN_TARGETS[t]); return 'Opening demo: ' + t; }
-    return 'usage: open <thz|tt|lora|angel|ngap|contact|skills>'; },
-  sudo(){ return 'Nice try. This portfolio is read-only.'; }
+    return 'usage: open <thz|tt|lora|angel|fss|tdma|ngap|logbook|contact|skills>'; },
+  'hire-me'(){ setTimeout(openHire, 250); return 'Powering up the SV-CORE contact chip ...'; },
+  '/hire-me'(){ setTimeout(openHire, 250); return 'Powering up the SV-CORE contact chip ...'; },
+  morse(args){ return sendMorse(args.join(' ')); },
+  sudo(args){
+    const cmd = args.join(' ').toLowerCase().replace(/\s+/g, ' ').trim();
+    if(/^rm\s+-[a-z]*(rf|fr)[a-z]*\s+\/\*?(\s+--no-preserve-root)?$/.test(cmd)){
+      setTimeout(crashPage, 900);
+      return '[sudo] password for recruiter: ********\nrm: removing /usr /home /etc /portfolio ...';
+    }
+    if(cmd.includes('hire')){ setTimeout(() => goTo('#contact'), 700); return '[sudo] password for recruiter: ********\nAccess granted. Opening contact ...'; }
+    return '😎 without rf there is no one named sudarshan\n(go on, try it: sudo rm -rf /)'; }
 };
+
+/* ---- /hire-me: a chip "boots", then flips into an animated contact card ---- */
+let hireOpen = false;
+function openHire(){
+  if(hireOpen) return; hireOpen = true;
+  const ov = document.createElement('div'); ov.className = 'sv-hire'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', 'Contact card');
+  ov.innerHTML =
+    '<div class="hire-stage">' +
+      '<div class="hire-chip" id="hChip"><i class="led"></i>SV-CORE</div>' +
+      '<pre class="hire-log" id="hLog"></pre>' +
+      '<div class="hire-card" id="hCard">' +
+        '<button type="button" class="hire-x" aria-label="Close">×</button>' +
+        '<h3>Sudarshan V</h3><div class="sub">SYSTEM READY · open to Hardware Engineering internships</div>' +
+        '<div class="row"><b>EMAIL</b><a href="mailto:' + EMAIL + '">' + EMAIL + '</a><button type="button" class="mini" data-copy-hire>Copy</button></div>' +
+        '<div class="row"><b>PHONE</b><a href="tel:+919025876308">+91 90258 76308</a></div>' +
+        '<div class="row"><b>LINKEDIN</b><a href="https://linkedin.com/in/sudarshan-veera8" target="_blank" rel="noopener">linkedin.com/in/sudarshan-veera8</a></div>' +
+        '<div class="row"><b>GITHUB</b><a href="https://github.com/Sudarshan-veera" target="_blank" rel="noopener">github.com/Sudarshan-veera</a></div>' +
+        '<div class="row"><b>RESUME</b><a href="' + RESUME_URL + '" target="_blank" rel="noopener">Open resume</a></div>' +
+        '<div class="row"><button type="button" data-hire-form>Send a message</button></div>' +
+      '</div>' +
+      '<div class="hire-skip">Esc or click outside to close</div>' +
+    '</div>';
+  document.body.appendChild(ov);
+  const chip = $('#hChip', ov), log = $('#hLog', ov), card = $('#hCard', ov);
+  // pins around the chip
+  const pins = [];
+  for(let i = 0; i < 6; i++){
+    const o = 16 + i * 22;
+    [['top:-8px;left:' + o + 'px', 'v'], ['bottom:-8px;left:' + o + 'px', 'v'], ['left:-12px;top:' + o + 'px', ''], ['right:-12px;top:' + o + 'px', '']].forEach(([st, c]) => {
+      const p = document.createElement('i'); p.className = 'pin ' + c; p.style.cssText = st; chip.appendChild(p); pins.push(p);
+    });
+  }
+  const timers = [];
+  const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+  function close(){
+    timers.forEach(clearTimeout); document.removeEventListener('keydown', onKey);
+    ov.classList.remove('on'); setTimeout(() => ov.remove(), 350); hireOpen = false;
+  }
+  function onKey(e){ if(e.key === 'Escape') close(); }
+  document.addEventListener('keydown', onKey);
+  ov.addEventListener('click', e => { if(e.target === ov || e.target.closest('.hire-x')) close(); });
+  $('[data-copy-hire]', ov).addEventListener('click', () => { try { navigator.clipboard.writeText(EMAIL); } catch(e){} toast('Email copied'); });
+  $('[data-hire-form]', ov).addEventListener('click', () => { close(); goTo('#contact'); });
+  requestAnimationFrame(() => ov.classList.add('on'));
+  const lines = ['VCC .......... 3.3 V   OK', 'CLK .......... 100 MHz OK', 'RESET ........ released', 'ASIC / RF / EMBEDDED / 5G ... OK', '', 'SYSTEM READY'];
+  function showCard(){ chip.classList.add('gone'); log.classList.add('gone'); later(() => { card.classList.add('show'); $$('.row', card).forEach((r, i) => r.style.animationDelay = (0.12 * i) + 's'); }, 350); }
+  if(reduceMotion){ chip.style.display = 'none'; log.style.display = 'none'; card.classList.add('show'); return; }
+  let li = 0;
+  (function step(){
+    if(!hireOpen) return;
+    log.textContent += lines[li] + '\n';
+    for(let k = 0; k < 4 && pins.length; k++){ const p = pins[(li * 4 + k) % pins.length]; if(p) p.classList.add('on'); }
+    li++;
+    if(li < lines.length) later(step, 330);
+    else { pins.forEach(p => p.classList.add('on')); chip.classList.add('live'); later(showCard, 900); }
+  })();
+}
+
+/* ---- Morse code: translate text and flash the terminal LED and the chip's pin 1 ---- */
+const MORSE = {A:'.-',B:'-...',C:'-.-.',D:'-..',E:'.',F:'..-.',G:'--.',H:'....',I:'..',J:'.---',K:'-.-',L:'.-..',M:'--',N:'-.',O:'---',P:'.--.',Q:'--.-',R:'.-.',S:'...',T:'-',U:'..-',V:'...-',W:'.--',X:'-..-',Y:'-.--',Z:'--..',
+  '0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....','6':'-....','7':'--...','8':'---..','9':'----.','.':'.-.-.-',',':'--..--','?':'..--..','/':'-..-.','-':'-....-'};
+const NATO = {A:'Alfa',B:'Bravo',C:'Charlie',D:'Delta',E:'Echo',F:'Foxtrot',G:'Golf',H:'Hotel',I:'India',J:'Juliett',K:'Kilo',L:'Lima',M:'Mike',N:'November',O:'Oscar',P:'Papa',Q:'Quebec',R:'Romeo',S:'Sierra',T:'Tango',U:'Uniform',V:'Victor',W:'Whiskey',X:'X-ray',Y:'Yankee',Z:'Zulu'};
+let morseToken = 0;
+function sendMorse(text){
+  text = (text || '').toUpperCase().slice(0, 40);
+  if(!text.trim()) return 'usage: morse <text>   e.g.  morse sos\nFlashes the LEDs in Morse code (lamp signalling, like on a ship).';
+  const words = text.trim().split(/\s+/);
+  const code = words.map(w => [...w].filter(c => MORSE[c]).map(c => MORSE[c]).join(' ')).join('  /  ');
+  const flags = [...text].filter(c => NATO[c]).map(c => NATO[c]).join(' ');
+  // build on/off timeline in units (dot = 1, dash = 3, gaps 1 / 3 / 7)
+  const U = reduceMotion ? 0 : 110, steps = [];
+  words.forEach((w, wi) => {
+    [...w].filter(c => MORSE[c]).forEach((c, ci, arr) => {
+      [...MORSE[c]].forEach((sym, si, syms) => { steps.push([true, sym === '.' ? 1 : 3]); if(si < syms.length - 1) steps.push([false, 1]); });
+      if(ci < arr.length - 1) steps.push([false, 3]);
+    });
+    if(wi < words.length - 1) steps.push([false, 7]);
+  });
+  const led = $('#morseLed'), pin = $('.chip .pin1'), tok = ++morseToken;
+  const set = on => { led.classList.toggle('on', on); if(pin) pin.classList.toggle('morse-on', on); };
+  if(U){
+    let i = 0;
+    (function next(){ if(tok !== morseToken) { set(false); return; } if(i >= steps.length){ set(false); return; }
+      const [on, n] = steps[i++]; set(on); setTimeout(next, n * U); })();
+  }
+  return code + '\nflags: ' + flags + '\n' + (U ? '[LED flashing at ' + U + ' ms per unit, watch the terminal bar and the chip]' : '[reduced motion is on, so the LED does not flash]');
+}
+
+/* ---- Easter egg: "sudo rm -rf /" makes the page fall apart ---- */
+let crashed = false;
+function crashPage(){
+  if(crashed) return; crashed = true;
+  SW.skip();
+  document.documentElement.style.overflow = 'hidden';
+  const vh = innerHeight;
+  const nodes = $$('header.frame, .hero > *, section.block > *, footer.frame > *, .totop, .sw-hud, .progress, #progress');
+  nodes.forEach((el, i) => {
+    const r = el.getBoundingClientRect();
+    if(r.bottom < 0 || r.top > vh * 1.2) return;
+    const dx = (Math.random() - .5) * 140, rot = (Math.random() - .5) * 60;
+    el.style.pointerEvents = 'none';
+    if(reduceMotion){ el.style.visibility = 'hidden'; return; }
+    el.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + (vh - r.top + 300) + 'px) rotate(' + rot + 'deg)', opacity: 1 }],
+      { duration: 900 + Math.random() * 900, delay: Math.random() * 900, easing: 'cubic-bezier(.55,0,1,.55)', fill: 'forwards' });
+  });
+  setTimeout(() => {
+    const p = document.createElement('div'); p.className = 'sv-panic';
+    p.innerHTML = '<div><b>kernel panic</b> - not syncing: attempted to kill init (the portfolio)</div><div>Everything fell off the screen. Nothing was actually deleted.</div><button type="button">Reload page</button>';
+    document.body.appendChild(p); requestAnimationFrame(() => p.classList.add('on'));
+    $('button', p).addEventListener('click', () => location.reload());
+    $('button', p).focus();
+  }, reduceMotion ? 300 : 2600);
+}
+
 function runCommand(line){
   const trimmed = line.trim();
   printCmd(line);
@@ -1797,7 +2959,7 @@ function bootTerminal(){
     })();
   })();
 }
-setTimeout(bootTerminal, 900);
+SW.whenRevealed($('#term'), () => setTimeout(bootTerminal, 500));   // start typing once the terminal is built
 
 /* ==========================================================================
    F. CONTACT FORM
@@ -2358,6 +3520,529 @@ document.addEventListener('keydown', e => {
 console.log('%cSUDARSHAN V', 'font:700 22px monospace;color:#A6620A');
 console.log('Curious about the code? The whole site is one index.html.\nTry the terminal on the page ("help") or press Ctrl+K.\nContact: ' + EMAIL);
 
+window.SVApp = { setSkill, skillTargets, goTo };   // used by the lab script that follows
+})();
+</script>
+<!-- =====================================================================
+     LAB SCRIPT (marker: sv-lab): oscilloscope, dipole antenna, skill graph, GitHub feed, spotlight
+     ===================================================================== -->
+<script>
+/* sv-lab */
+(function(){
+'use strict';
+var doc=document, root=doc.documentElement;
+var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+var $=function(s){return doc.getElementById(s);};
+var cv=function(n){return getComputedStyle(root).getPropertyValue(n).trim()||'#888';};
+var clamp=function(v,a,b){return Math.max(a,Math.min(b,v));};
+
+/* canvas helper: crisp on retina, redraws only while visible */
+function setup(c,draw,onFrame){
+  var ctx=c.getContext('2d'), W=0,H=0, on=false, raf=0;
+  function size(){
+    var dpr=Math.min(2,devicePixelRatio||1), r=c.getBoundingClientRect();
+    W=Math.max(100,r.width); H=parseInt(c.getAttribute('height'),10)||200;
+    c.width=W*dpr; c.height=H*dpr; c.style.height=H+'px'; ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function frame(t){ raf=0; if(!on) return; if(onFrame) onFrame(t); draw(ctx,W,H,t); if(!reduce||onFrame===null) {} raf=requestAnimationFrame(frame); }
+  new IntersectionObserver(function(es){ on=es[0].isIntersecting; if(on&&!raf){size(); raf=requestAnimationFrame(frame);} },{threshold:0.05}).observe(c);
+  addEventListener('resize',function(){size(); draw(ctx,W,H,performance.now());});
+  size(); draw(ctx,W,H,0);
+  return {redraw:function(){draw(ctx,W,H,performance.now());},size:function(){return {W:W,H:H};}};
+}
+
+/* ===================== 1. OSCILLOSCOPE ===================== */
+(function(){
+  var c=$('scope'); if(!c) return;
+  var N=420, input=[], avg=[], flags=[], phase=0, freq=1.6, amp=0.55, spike=0, win=[], T=0.34, mouse=null;
+  function sample(){
+    phase+=freq*0.045;
+    var v=Math.sin(phase)*amp+(Math.random()-.5)*0.14;
+    if(spike>0){ v+=(spike===8?1:.7)*0.9*(spike%2?1:-1); spike--; }
+    win.push(v); if(win.length>8) win.shift();
+    var a=win.reduce(function(s,x){return s+x;},0)/win.length;
+    input.push(v); avg.push(a); flags.push(Math.abs(v-a)>T);
+    if(input.length>N){input.shift();avg.shift();flags.shift();}
+  }
+  var anomalies=0, shown='';
+  var g=setup(c,function(x,W,H){
+    x.fillStyle='#0E1114'; x.fillRect(0,0,W,H);
+    x.strokeStyle='rgba(120,180,140,.14)'; x.lineWidth=1; x.beginPath();
+    for(var i=0;i<=10;i++){var gx=W*i/10; x.moveTo(gx,0); x.lineTo(gx,H);}
+    for(var j=0;j<=6;j++){var gy=H*j/6; x.moveTo(0,gy); x.lineTo(W,gy);} x.stroke();
+    function trace(arr,col,lw,off){
+      x.strokeStyle=col; x.lineWidth=lw; x.beginPath();
+      arr.forEach(function(v,k){var px=W*k/N, py=H/2-(v*H*0.36)+off; k?x.lineTo(px,py):x.moveTo(px,py);}); x.stroke();
+    }
+    trace(input,'#7FD9A0',1.4,0); trace(avg,'#E0A45C',2,0);
+    x.fillStyle='#FF6B6B';
+    flags.forEach(function(f,k){ if(f){ x.fillRect(W*k/N-1,H-12,3,8);} });
+    x.fillStyle='#7FD9A0'; x.font='11px IBM Plex Mono, monospace'; x.fillText('CH1',8,14); x.fillStyle='#E0A45C'; x.fillText('CH2 avg8',44,14);
+    if(mouse){ x.strokeStyle='rgba(255,255,255,.25)'; x.beginPath(); x.moveTo(mouse.x,0); x.lineTo(mouse.x,H); x.moveTo(0,mouse.y); x.lineTo(W,mouse.y); x.stroke(); }
+  },function(){
+    sample(); sample();
+    var n=flags.filter(Boolean).length;
+    var txt='f≈'+(freq*1.0).toFixed(2)+' kHz · amp '+amp.toFixed(2)+' V · flags in window: '+n+(n?'  ⚠ ANOMALY':'  ✓ nominal');
+    if(txt!==shown){shown=txt; $('scopeRead').textContent=txt;}
+  });
+  function mv(e){ var r=c.getBoundingClientRect(), p=e.touches?e.touches[0]:e; var x=p.clientX-r.left, y=p.clientY-r.top;
+    mouse={x:x,y:y}; freq=0.5+3.5*clamp(x/r.width,0,1); amp=0.15+0.8*(1-clamp(y/r.height,0,1)); }
+  c.addEventListener('mousemove',mv); c.addEventListener('touchmove',mv,{passive:true}); c.addEventListener('mouseleave',function(){mouse=null;});
+  $('scopeSpike').addEventListener('click',function(){spike=8;});
+  c.addEventListener('click',function(){spike=8;});
+})();
+
+
+/* ===================== 2b. HOW THE THz SENSOR WORKS ===================== */
+(function(){
+  var c=$('thzx'); if(!c) return;
+  var vs=$('thzxV'), ss=$('thzxS'), vv=$('thzxVv'), sv=$('thzxSv'), rd=$('thzxRead');
+  var F0=3.892, Q=30.22, T=function(th){return 3.03+9.3*th+146*th*th-76.7*th*th*th;};
+  var T1=T(.01), T40=T(.40);
+  function eps(v){ var th=v/100; return 2.3+(24.96-2.3)*(T(th)-T1)/(T40-T1); }   // Topp shape, matched to the paper's end points
+  function fres(v,S){ return F0-S/1000*(Math.sqrt(eps(v))-Math.sqrt(2.3)); }
+  function lor(f,f0){ var w=f0/Q/2; return 1/(1+Math.pow((f-f0)/w,2)); }
+  var t0=performance.now();
+  var g=setup(c,function(x,W,H,t){
+    var v=parseFloat(vs.value), S=parseFloat(ss.value), f0=fres(v,S), er=eps(v);
+    x.fillStyle='#0E1114'; x.fillRect(0,0,W,H);
+    var lw=Math.min(W*0.4,300), ph=(t||0)/400;
+    // ---- left: layer stack ----
+    var sx=20, sw=lw-30, y=H-30;
+    function layer(h,col,label,lc){ y-=h; x.fillStyle=col; x.fillRect(sx,y,sw,h); x.fillStyle=lc||'#0E1114'; x.font='10.5px IBM Plex Mono, monospace'; x.fillText(label,sx+6,y+h/2+4); }
+    layer(26,'#8A6F3A','polyimide 50 µm');
+    layer(8,'#C3C9CF','Al 0.2 µm');
+    // GaAs resonator patches
+    y-=14; x.fillStyle='#6E9BE0'; for(var i=0;i<5;i++){ x.fillRect(sx+4+i*(sw/5),y,sw/5-8,14); } x.fillStyle='#6E9BE0'; x.font='10.5px IBM Plex Mono, monospace'; x.fillText('GaAs resonator',sx+sw+6,y+11);
+    // soil analyte
+    var wet=clamp((v-1)/39,0,1), r=Math.round(184+(90-184)*wet), gc=Math.round(138+(59-138)*wet), b=Math.round(82+(28-82)*wet);
+    y-=44; x.fillStyle='rgb('+r+','+gc+','+b+')'; x.fillRect(sx,y,sw,44);
+    var nd=Math.round(2+wet*22); x.fillStyle='rgba(120,190,255,.9)';
+    for(var d=0;d<nd;d++){ var dx=sx+((d*53)%97)/97*(sw-8)+4, dy=y+((d*37)%89)/89*34+5; x.beginPath(); x.arc(dx,dy,2.2,0,6.283); x.fill(); }
+    x.fillStyle='#fff'; x.font='10.5px IBM Plex Mono, monospace'; x.fillText('soil  ε='+er.toFixed(1),sx+6,y+16);
+    // incident wave
+    var top=y-8; x.strokeStyle='#E0A45C'; x.lineWidth=1.8; x.beginPath();
+    for(var k=0;k<=60;k++){ var yy=top-k*(top-14)/60, xx=sx+sw/2+Math.sin(k*0.7-ph*3)*9*(k/60+.15); k?x.lineTo(xx,yy):x.moveTo(xx,yy); } x.stroke();
+    x.fillStyle='#E0A45C'; x.beginPath(); x.moveTo(sx+sw/2-5,top-6); x.lineTo(sx+sw/2+5,top-6); x.lineTo(sx+sw/2,top+4); x.fill(); x.fillText('THz in',sx+sw/2+14,24);
+    // ---- right: spectrum ----
+    var px=lw+40, pw=W-px-16, py=16, phh=H-58, fa=2.9, fb=4.15;
+    x.strokeStyle='rgba(120,180,140,.14)'; x.lineWidth=1; x.beginPath();
+    for(var gi=0;gi<=5;gi++){ var gy=py+phh*gi/5; x.moveTo(px,gy); x.lineTo(px+pw,gy);} x.stroke();
+    x.fillStyle='rgba(200,210,200,.75)'; x.font='10px IBM Plex Mono, monospace';
+    for(var fi=3;fi<=4;fi+=0.25){ var gx=px+pw*(fi-fa)/(fb-fa); x.fillText(fi.toFixed(2),gx-11,H-28); }
+    x.fillText('frequency (THz)',px+pw/2-40,H-12); x.fillText('absorption',px,py+8);
+    function curve(f0c,col,lwid,dash){ x.strokeStyle=col; x.lineWidth=lwid; x.setLineDash(dash||[]); x.beginPath();
+      for(var q=0;q<=240;q++){ var f=fa+(fb-fa)*q/240, a=0.04+0.94*lor(f,f0c), X=px+pw*q/240, Y=py+phh*(1-a); q?x.lineTo(X,Y):x.moveTo(X,Y);} x.stroke(); x.setLineDash([]); }
+    curve(F0,'rgba(200,210,200,.45)',1.4,[4,4]);
+    curve(f0,'#7FD9A0',2.2);
+    var mx=px+pw*(f0-fa)/(fb-fa); x.strokeStyle='rgba(255,255,255,.3)'; x.beginPath(); x.moveTo(mx,py); x.lineTo(mx,py+phh); x.stroke();
+    x.fillStyle='#E0A45C'; x.fillText(f0.toFixed(3)+' THz',clamp(mx+6,px,px+pw-62),py+18);
+  },function(){});
+  function upd(){
+    var v=parseFloat(vs.value), S=parseFloat(ss.value), f0=fres(v,S), er=eps(v);
+    vv.textContent=v+' %'; sv.textContent=S+' GHz/RIU';
+    rd.textContent='VWC '+v+' % → ε ≈ '+er.toFixed(2)+', n ≈ '+Math.sqrt(er).toFixed(2)+' → peak at '+f0.toFixed(3)+' THz (shift '+((f0-F0)*1000).toFixed(0)+' GHz from the 1 % reference). Linewidth ≈ '+(f0/Q*1000).toFixed(0)+' GHz at Q = 30.22.';
+    g.redraw();
+  }
+  vs.addEventListener('input',upd); ss.addEventListener('input',upd); upd();
+})();
+
+/* ===================== 2c. HOW THE TUNABLE FSS WORKS ===================== */
+(function(){
+  var c=$('fssx'); if(!c) return;
+  var cs=$('fssxC'), gs=$('fssxG'), fsl=$('fssxF'), cv_=$('fssxCv'), gv=$('fssxGv'), fv=$('fssxFv'), rd=$('fssxRead');
+  function interp(pts,x){ if(x<=pts[0][0]) return pts[0][1]; for(var i=1;i<pts.length;i++){ if(x<=pts[i][0]){ var a=pts[i-1], b=pts[i], k=(x-a[0])/(b[0]-a[0]); return a[1]+(b[1]-a[1])*k; } } return pts[pts.length-1][1]; }
+  var D1=[[.07,10],[.17,41.7],[.19,28],[.21,22.3],[.23,19],[.25,17],[.27,15.3],[.29,14],[.31,13],[.33,12]];
+  var D2=[[.07,33],[.17,13.5],[.19,12.8],[.21,11.7],[.23,11],[.25,10.5],[.27,9.7],[.29,9.2],[.31,8.8],[.33,8.3]];
+  function model(C,mu){
+    var f1=Math.sqrt(3.987/(C+0.314)), f2=Math.sqrt(65.88/(C+1.525)), k=(C-0.2)/0.9;
+    return [{f:f1,bw:(546+(155-546)*k)/1000,D:interp(D1,mu)},{f:f2,bw:(143+(777-143)*k)/1000,D:interp(D2,mu)}];
+  }
+  function s11(f,B){ var sum=0; B.forEach(function(b){ var x=(f-b.f)/(b.bw/2), kk=Math.max(b.D/10-1,0.3); sum+=b.D/(1+x*x*kk); }); return -Math.min(sum,48); }
+  var g=setup(c,function(x,W,H,t){
+    var C=parseFloat(cs.value), mu=parseFloat(gs.value), fp=parseFloat(fsl.value), B=model(C,mu), sp=s11(fp,B), gam=Math.pow(10,sp/20), ph=(t||0)/400;
+    x.fillStyle='#0E1114'; x.fillRect(0,0,W,H);
+    var lw=Math.min(W*0.42,330), sx=18, sw=lw-110, y=H-18;
+    function layer(h,col,label){ y-=h; x.fillStyle=col; x.fillRect(sx,y,sw,h); x.fillStyle='#D8DDD8'; x.font='10px IBM Plex Mono, monospace'; x.fillText(label,sx+sw+6,y+h/2+4); }
+    layer(6,'#E8E8E8','ground plane');
+    layer(40,'rgba(110,155,224,.35)','foam spacer 4 mm');
+    layer(15,'#B98F4C','high-R sheet');
+    layer(15,'#4C8F7A','ionic electrolyte');
+    layer(15,'#7FD9A0','PET + graphene');
+    layer(18,'#8A6F3A','F4B substrate');
+    y-=8; x.fillStyle='#E0A45C'; x.fillRect(sx,y,sw,8); x.fillStyle='#E0A45C'; x.fillText('resonator + varactors',sx+sw+6,y+8);
+    // incident and reflected waves
+    var cx=sx+sw*0.35, topY=y-6;
+    x.lineWidth=1.8; x.strokeStyle='#E0A45C'; x.beginPath();
+    for(var k=0;k<=50;k++){ var yy=14+k*(topY-14)/50, xx=cx+Math.sin(k*0.7-ph*3)*8; k?x.lineTo(xx,yy):x.moveTo(xx,yy);} x.stroke();
+    x.fillStyle='#E0A45C'; x.beginPath(); x.moveTo(cx-5,topY-8); x.lineTo(cx+5,topY-8); x.lineTo(cx,topY+2); x.fill(); x.fillText('in',cx-22,22);
+    x.globalAlpha=clamp(gam,0.04,1); x.strokeStyle='#FF6B6B'; x.beginPath(); var cx2=sx+sw*0.7;
+    for(var m=0;m<=50;m++){ var y2=topY-m*(topY-14)/50, x2=cx2+Math.sin(m*0.7+ph*3)*8; m?x.lineTo(x2,y2):x.moveTo(x2,y2);} x.stroke();
+    x.fillStyle='#FF6B6B'; x.beginPath(); x.moveTo(cx2-5,22); x.lineTo(cx2+5,22); x.lineTo(cx2,12); x.fill(); x.globalAlpha=1; x.fillText(sw<150?'out':'reflected',cx2-6,22);
+    // ---- spectrum ----
+    var px=lw+44, pw=W-px-14, py=14, phh=H-52, fa=1, fb=7, dmax=45;
+    x.strokeStyle='rgba(120,180,140,.14)'; x.lineWidth=1; x.beginPath();
+    for(var gi=0;gi<=5;gi++){ var gy=py+phh*gi/5; x.moveTo(px,gy); x.lineTo(px+pw,gy);} x.stroke();
+    x.fillStyle='rgba(200,210,200,.75)'; x.font='10px IBM Plex Mono, monospace';
+    for(var di=0;di<=5;di++) x.fillText('-'+(di*9),px-30,py+phh*di/5+4);
+    for(var f=1;f<=7;f++){ var gx=px+pw*(f-fa)/(fb-fa); x.fillText(f+'',gx-3,H-26); }
+    x.fillText('frequency (GHz)',px+pw/2-40,H-10); x.fillText('S11 (dB)',px,py+0);
+    var y10=py+phh*(10/dmax); x.strokeStyle='rgba(255,107,107,.55)'; x.setLineDash([4,4]); x.beginPath(); x.moveTo(px,y10); x.lineTo(px+pw,y10); x.stroke(); x.setLineDash([]);
+    x.fillStyle='rgba(255,107,107,.8)'; x.fillText('-10 dB: 90 % absorbed',px+pw-118,y10-4);
+    x.strokeStyle='#7FD9A0'; x.lineWidth=2.2; x.beginPath();
+    for(var q=0;q<=300;q++){ var ff=fa+(fb-fa)*q/300, X=px+pw*q/300, Y=py+phh*(-s11(ff,B)/dmax); q?x.lineTo(X,Y):x.moveTo(X,Y);} x.stroke();
+    var mx=px+pw*(fp-fa)/(fb-fa); x.strokeStyle='rgba(255,255,255,.35)'; x.beginPath(); x.moveTo(mx,py); x.lineTo(mx,py+phh); x.stroke();
+    x.fillStyle='#E0A45C'; x.beginPath(); x.arc(mx,py+phh*(-sp/dmax),4.5,0,6.283); x.fill();
+  },function(){});
+  function upd(){
+    var C=parseFloat(cs.value), mu=parseFloat(gs.value), fp=parseFloat(fsl.value), B=model(C,mu), sp=s11(fp,B), ab=100*(1-Math.pow(10,sp/10));
+    cv_.textContent=C.toFixed(2)+' pF'; gv.textContent=mu.toFixed(2)+' eV'; fv.textContent=fp.toFixed(2)+' GHz';
+    rd.textContent='Band 1: '+B[0].f.toFixed(2)+' GHz, '+(B[0].bw*1000).toFixed(0)+' MHz wide, '+(-B[0].D).toFixed(0)+' dB   ·   Band 2: '+B[1].f.toFixed(2)+' GHz, '+(B[1].bw*1000).toFixed(0)+' MHz wide, '+(-B[1].D).toFixed(0)+' dB   ·   Probe at '+fp.toFixed(2)+' GHz: S11 '+sp.toFixed(1)+' dB, '+ab.toFixed(ab>99.9?2:1)+' % absorbed';
+    g.redraw();
+  }
+  [cs,gs,fsl].forEach(function(e){e.addEventListener('input',upd);}); upd();
+})();
+
+
+/* ===================== 6. A DAY IN THE LAB (scroll story) ===================== */
+(function(){
+  var wrap=$('storyWrap'), c=$('storyc'), tx=$('storyText'), rail=$('storyRail'); if(!wrap||!c) return;
+  var ctx=c.getContext('2d'), W=0,H=0, p=0, stage=0, vis=false;
+  var TEXT=[
+    ['01 · DESIGN','Draw the resonator','THz metamaterial sensor · tunable FSS (CST)','A square ring is a loop with an inductance and a capacitance. Cutting gaps and adding diagonal paths changes both, so I sketch D1 to D4 in CST until the resonance lands where I want it.'],
+    ['02 · SIMULATE','Break it in software','THz sensor · FSS (CST + ADS)','The longer current path moves the resonance from 4.5 THz down to 3.892 THz, and the absorption there rises towards 1 (Q = 30.22). For the FSS I sweep the varactor, read S11 and repeat, then check the idea with an equivalent circuit in ADS.'],
+    ['03 · TAPE-OUT','Turn logic into silicon','TinyTapeout anomaly detector (Verilog, cocotb, OpenROAD)','A moving-average anomaly detector in Verilog, verified with cocotb, then hardened on SKY130. Fixing the met5 power-grid error and the gate-level X-values was part of getting it to 186.3 µW.'],
+    ['04 · FIELD TEST','Take it outside','ANGEL BOT (ESP32-CAM, MQ-135, INMP441)','The ESP32-CAM streams video, an MQ-135 sensor watches the air and an INMP441 microphone listens over I2S. As the robot nears the hazard, the gas reading and the noise rise, and the alert fires.']
+  ];
+  function setText(i){
+    tx.classList.add('swap');
+    setTimeout(function(){ var t=TEXT[i]; tx.innerHTML='<div class="st-n">'+t[0]+'</div><h3>'+t[1]+'</h3><p>'+t[3]+'</p><div class="st-proj">'+t[2]+'</div>'; tx.classList.remove('swap'); },reduce?0:180);
+    Array.prototype.forEach.call(rail.children,function(b,k){ b.classList.toggle('on',k===i); });
+  }
+  function size(){ var dpr=Math.min(2,devicePixelRatio||1), r=c.getBoundingClientRect(); W=Math.max(120,r.width); H=Math.max(120,r.height); c.width=W*dpr; c.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
+  function prog(){ var r=wrap.getBoundingClientRect(), total=r.height-innerHeight*0.9; return clamp(-(r.top-64)/Math.max(1,total),0,1); }
+  function sm(t){return t*t*(3-2*t);}
+  function hash(n){ var x=Math.sin(n*127.1)*43758.5453; return x-Math.floor(x); }
+  function grid(sx){ ctx.strokeStyle='rgba(120,180,140,.10)'; ctx.lineWidth=1; ctx.beginPath(); for(var x=0;x<=W;x+=sx){ctx.moveTo(x,0);ctx.lineTo(x,H);} for(var y=0;y<=H;y+=sx){ctx.moveTo(0,y);ctx.lineTo(W,y);} ctx.stroke(); }
+  function lor(f,f0,w){ return 1/(1+Math.pow((f-f0)/w,2)); }
+  function label(t,x,y,col){ ctx.fillStyle=col||'#D8DDD8'; ctx.font='11px IBM Plex Mono, monospace'; ctx.fillText(t,x,y); }
+
+  function sceneDesign(t,now){
+    grid(24);
+    var n=4, cols=W>520?4:2, rows=n/cols, cw=W/cols, ch=(H-20)/rows, s=Math.min(cw,ch)-44;
+    var caps=['D1 square ring','D2 gaps cut','D3 diagonals','D4 diagonals joined'];
+    for(var k=0;k<n;k++){
+      var a=sm(clamp(t*n-k+0.2,0,1)); if(a<=0) continue;
+      var cx=(k%cols)*cw+cw/2, cy=Math.floor(k/cols)*ch+ch/2-8, h=s/2, g=h*0.22;
+      ctx.globalAlpha=a; ctx.strokeStyle=(k===n-1&&t>0.85)?'#E0A45C':'#6E9BE0'; ctx.lineWidth=3; ctx.lineCap='butt';
+      ctx.beginPath();
+      if(k===0){ ctx.rect(cx-h,cy-h,2*h,2*h); }
+      else { // ring with four gaps in the middle of the sides
+        ctx.moveTo(cx-h,cy-g); ctx.lineTo(cx-h,cy-h); ctx.lineTo(cx-g,cy-h);
+        ctx.moveTo(cx+g,cy-h); ctx.lineTo(cx+h,cy-h); ctx.lineTo(cx+h,cy-g);
+        ctx.moveTo(cx+h,cy+g); ctx.lineTo(cx+h,cy+h); ctx.lineTo(cx+g,cy+h);
+        ctx.moveTo(cx-g,cy+h); ctx.lineTo(cx-h,cy+h); ctx.lineTo(cx-h,cy+g);
+      }
+      ctx.stroke();
+      if(k>=2){ var e=(k===2)?0.62:1; ctx.strokeStyle='#7FD9A0'; ctx.beginPath();
+        ctx.moveTo(cx-h*e*0.15,cy-h*e*0.15); ctx.lineTo(cx-h*e,cy-h*e); ctx.moveTo(cx+h*e*0.15,cy+h*e*0.15); ctx.lineTo(cx+h*e,cy+h*e);
+        ctx.moveTo(cx+h*e*0.15,cy-h*e*0.15); ctx.lineTo(cx+h*e,cy-h*e); ctx.moveTo(cx-h*e*0.15,cy+h*e*0.15); ctx.lineTo(cx-h*e,cy+h*e); ctx.stroke(); }
+      label(caps[k],cx-h,cy+h+18,'#D8DDD8'); ctx.globalAlpha=1;
+    }
+  }
+  function sceneSim(t,now){
+    grid(30);
+    var px=44, pw=W-px-16, py=20, ph=H-70, fa=3.2, fb=4.9;
+    ctx.strokeStyle='rgba(200,210,200,.5)'; ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px,py+ph); ctx.lineTo(px+pw,py+ph); ctx.stroke();
+    for(var f=3.5;f<=4.8;f+=0.5) label(f.toFixed(1),px+pw*(f-fa)/(fb-fa)-8,H-34);
+    label('frequency (THz)',px+pw/2-44,H-14); label('absorption',6,py+8);
+    var f2=4.5-0.608*sm(t), a2=0.35+0.62*sm(t), a1=0.35*(1-sm(t));
+    ctx.strokeStyle='#E0A45C'; ctx.lineWidth=2.4; ctx.beginPath();
+    for(var q=0;q<=260;q++){ var ff=fa+(fb-fa)*q/260, y=0.03+Math.min(0.99,a1*lor(ff,3.8,0.045)+a2*lor(ff,f2,f2/30.2/2)); var X=px+pw*q/260, Y=py+ph*(1-y); q?ctx.lineTo(X,Y):ctx.moveTo(X,Y);} ctx.stroke();
+    var mx=px+pw*(f2-fa)/(fb-fa); ctx.setLineDash([4,4]); ctx.strokeStyle='rgba(255,255,255,.4)'; ctx.beginPath(); ctx.moveTo(mx,py); ctx.lineTo(mx,py+ph); ctx.stroke(); ctx.setLineDash([]);
+    label(f2.toFixed(3)+' THz',clamp(mx+8,px,px+pw-70),py+16,'#7FD9A0');
+    if(t>0.9) label('Q = 30.22',px+pw-80,py+34,'#E0A45C');
+    // tiny FSS inset: two bands slide with the varactor
+    var iw=Math.min(190,W*0.38), ih=70, ix=px+8, iy=py+ph-ih-8; ctx.fillStyle='rgba(14,17,20,.8)'; ctx.fillRect(ix,iy,iw,ih); ctx.strokeStyle='rgba(120,180,140,.4)'; ctx.strokeRect(ix,iy,iw,ih);
+    var C=0.2+0.9*sm(t), b1=Math.sqrt(3.987/(C+0.314)), b2=Math.sqrt(65.88/(C+1.525)); ctx.strokeStyle='#7FD9A0'; ctx.lineWidth=1.6; ctx.beginPath();
+    for(var m=0;m<=120;m++){ var g=1+6*m/120, d=-(30/(1+Math.pow((g-b1)/0.12,2))+30/(1+Math.pow((g-b2)/0.2,2))); var X2=ix+iw*m/120, Y2=iy+8+(ih-16)*(-d/45>1?1:-d/45); m?ctx.lineTo(X2,Y2):ctx.moveTo(X2,Y2);} ctx.stroke();
+    label('FSS: C '+C.toFixed(2)+' pF',ix+6,iy+ih-6,'#D8DDD8');
+  }
+  function sceneTape(t,now){
+    var dw=Math.min(W-40,520), dh=Math.min(H-80,dw*0.62), dx=(W-dw)/2, dy=(H-dh)/2-6;
+    ctx.fillStyle='#0A0C10'; ctx.fillRect(dx,dy,dw,dh); ctx.strokeStyle='#3A4048'; ctx.lineWidth=2; ctx.strokeRect(dx,dy,dw,dh);
+    var rows=Math.floor(dh/14), place=clamp(t/0.55,0,1), route=clamp((t-0.5)/0.3,0,1), fin=clamp((t-0.8)/0.2,0,1), cols=['#1D3A6B','#2E6B4A','#6B4A1D','#4A2E6B'];
+    var total=rows*14, idx=0;
+    for(var r=0;r<rows;r++){ var x=dx+4; var k=0; while(x<dx+dw-24){ var w=14+Math.floor(hash(r*31+k)*34); idx++; if(idx/ (total*0.9) <= place){ ctx.fillStyle=cols[Math.floor(hash(r*7+k*3)*4)]; ctx.fillRect(x,dy+4+r*14,Math.min(w,dx+dw-4-x)-2,11);} x+=w; k++; } }
+    ctx.lineWidth=1; ctx.globalAlpha=route; ctx.strokeStyle='#FF6B6B'; ctx.beginPath(); for(var i=0;i<26;i++){ var yy=dy+10+hash(i*5)*(dh-20); ctx.moveTo(dx+6,yy); ctx.lineTo(dx+dw-6,yy);} ctx.stroke();
+    ctx.strokeStyle='#6E9BE0'; ctx.beginPath(); for(var j=0;j<18;j++){ var xx=dx+14+hash(j*9+2)*(dw-28); ctx.moveTo(xx,dy+6); ctx.lineTo(xx,dy+dh-6);} ctx.stroke();
+    ctx.strokeStyle='#E0A45C'; ctx.lineWidth=2; ctx.beginPath(); for(var s2=1;s2<5;s2++){ var sx=dx+dw*s2/5; ctx.moveTo(sx,dy); ctx.lineTo(sx,dy+dh);} ctx.stroke(); ctx.globalAlpha=1;
+    ctx.fillStyle='#E0A45C'; for(var q=0;q<10;q++){ var padx=dx+14+q*(dw-28)/9; ctx.globalAlpha=fin; ctx.fillRect(padx-4,dy-9,8,8); ctx.fillRect(padx-4,dy+dh+1,8,8);} ctx.globalAlpha=1;
+    var steps=['RTL (Verilog)','cocotb verify','place','route','GDS'], cur=Math.min(4,Math.floor(t*5));
+    steps.forEach(function(s,i){ label((i<=cur?'● ':'○ ')+s,dx+(dw/5)*i,H-8,i<=cur?'#7FD9A0':'#8A9199'); });
+    if(fin>0.2){ ctx.globalAlpha=fin; label('186.3 µW',dx+dw-70,dy+dh+26,'#E0A45C'); ctx.globalAlpha=1; }
+    label('SKY130 · tt_um_anomaly_detector',dx,dy-16);
+  }
+  function sceneField(t,now){
+    var cw=Math.min((W-20)/14,(H-70)/8), mx=(W-cw*14)/2, my=14;
+    ctx.strokeStyle='rgba(120,180,140,.16)'; ctx.lineWidth=1; ctx.beginPath(); for(var i=0;i<=14;i++){ctx.moveTo(mx+i*cw,my);ctx.lineTo(mx+i*cw,my+8*cw);} for(var j=0;j<=8;j++){ctx.moveTo(mx,my+j*cw);ctx.lineTo(mx+14*cw,my+j*cw);} ctx.stroke();
+    var HZ={x:9.5,y:2.5}, path=[[1.5,6.5],[4.5,6.5],[4.5,3.5],[8.5,3.5],[HZ.x-0.6,HZ.y+0.5]], L=[],tot=0;
+    for(var k=1;k<path.length;k++){ var d=Math.hypot(path[k][0]-path[k-1][0],path[k][1]-path[k-1][1]); L.push(d); tot+=d; }
+    var pos=sm(t)*tot*1.0, rx=path[0][0], ry=path[0][1], acc=0;
+    for(var s=0;s<L.length;s++){ if(pos<=acc+L[s]){ var f=(pos-acc)/L[s]; rx=path[s][0]+(path[s+1][0]-path[s][0])*f; ry=path[s][1]+(path[s+1][1]-path[s][1])*f; break; } acc+=L[s]; rx=path[s+1][0]; ry=path[s+1][1]; }
+    var dist=Math.hypot(rx-HZ.x,ry-HZ.y), gas=clamp(1-dist/6,0,1), flick=(Math.sin(now/90)+1)/2;
+    var gr=ctx.createRadialGradient(mx+HZ.x*cw,my+HZ.y*cw,2,mx+HZ.x*cw,my+HZ.y*cw,cw*3.2); gr.addColorStop(0,'rgba(255,107,107,.55)'); gr.addColorStop(1,'rgba(255,107,107,0)'); ctx.fillStyle=gr; ctx.fillRect(mx,my,14*cw,8*cw);
+    ctx.strokeStyle='rgba(224,164,92,.6)'; ctx.setLineDash([5,4]); ctx.beginPath(); path.forEach(function(q,i){ var X=mx+q[0]*cw,Y=my+q[1]*cw; i?ctx.lineTo(X,Y):ctx.moveTo(X,Y); }); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='#7FD9A0'; ctx.beginPath(); ctx.arc(mx+rx*cw,my+ry*cw,cw*0.28,0,6.283); ctx.fill(); ctx.strokeStyle='#fff'; ctx.stroke();
+    label('ESP32-CAM',mx+rx*cw+cw*0.4,my+ry*cw-cw*0.3,'#7FD9A0'); label('hazard',mx+HZ.x*cw-16,my+HZ.y*cw-cw*0.9,'#FF6B6B');
+    // sensor readouts
+    var by=my+8*cw+14; label('MQ-135',mx,by,'#D8DDD8'); ctx.fillStyle='#2A2F35'; ctx.fillRect(mx+58,by-9,110,9); ctx.fillStyle=gas>0.55?'#FF6B6B':'#7FD9A0'; ctx.fillRect(mx+58,by-9,110*gas,9);
+    label(Math.round(gas*620)+' ppm'+(gas>0.55?'  ⚠ ALERT':''),mx+176,by,gas>0.55?'#FF6B6B':'#D8DDD8');
+    label('INMP441',mx+(W>520?330:0),by+(W>520?0:16),'#D8DDD8'); for(var b=0;b<12;b++){ var hh=3+ (4+ gas*22)*(0.3+0.7*hash(b*13+Math.floor(now/110)))*(0.6+0.4*flick); ctx.fillStyle='#6E9BE0'; ctx.fillRect(mx+(W>520?400:62)+b*8,(W>520?by:by+16)-hh,5,hh); }
+  }
+  function draw(now){
+    ctx.fillStyle='#0E1114'; ctx.fillRect(0,0,W,H);
+    var s=Math.min(3,Math.floor(p*4+1e-6)), t=clamp(p*4-s,0,1);
+    if(reduce) t=Math.max(t,0.0);
+    [sceneDesign,sceneSim,sceneTape,sceneField][s](t,now);
+    ctx.fillStyle='rgba(200,210,200,.5)'; ctx.fillRect(0,H-3,W*p,3);
+  }
+  function update(){ var np=prog(); var ns=Math.min(3,Math.floor(np*4+1e-6)); p=np; if(ns!==stage||!tx.firstChild){ stage=ns; setText(ns); } }
+  function loop(now){ if(!vis) return; update(); draw(now); requestAnimationFrame(loop); }
+  new IntersectionObserver(function(es){ var was=vis; vis=es[0].isIntersecting; if(vis&&!was){ size(); requestAnimationFrame(loop); } },{rootMargin:'100px'}).observe(wrap);
+  addEventListener('resize',function(){size();});
+  rail.addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b) return; var i=+b.dataset.s, r=wrap.getBoundingClientRect(), total=r.height-innerHeight*0.9; window.scrollTo({top:scrollY+r.top-64+total*(i/4+0.02),behavior:reduce?'auto':'smooth'}); });
+  size(); update(); draw(0);
+})();
+
+/* ===================== 7. 3D CHIP VIEWER (raw WebGL, no libraries) ===================== */
+(function(){
+  var c=$('chip3d'); if(!c) return;
+  var note=$('chipNote'), spinB=$('chipSpin'), expB=$('chipExplode'), topB=$('chipTop'), legend=$('chipLegend');
+  var BASE='images/chip/';
+  var LAYERS=[
+    {k:'diff',n:'diff',col:'#4caf50',d:'diffusion: the transistor source and drain regions'},
+    {k:'poly',n:'poly',col:'#e53935',d:'polysilicon: the transistor gates'},
+    {k:'li1', n:'li1', col:'#fdd835',d:'local interconnect: wiring inside each standard cell'},
+    {k:'met1',n:'met1',col:'#42a5f5',d:'metal 1: horizontal routing and the power rails'},
+    {k:'met2',n:'met2',col:'#ab47bc',d:'metal 2: vertical signal routing'},
+    {k:'met3',n:'met3',col:'#ff9800',d:'metal 3: horizontal routing and the top-side pin stubs'},
+    {k:'met4',n:'met4',col:'#26c6da',d:'metal 4: the vertical power straps and the pins to the TinyTapeout mux'}
+  ];
+  var DEFAULT_NOTE='KLayout render of tt_um_anomaly_detector (SKY130) from the final GDS. Drag to rotate, or explode the layers to pull the metal stack apart.';
+  function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  function fallbackLayout(){
+    var cv=doc.createElement('canvas'); cv.width=1024; cv.height=640; var x=cv.getContext('2d'), r=rng(7);
+    x.fillStyle='#07090C'; x.fillRect(0,0,1024,640);
+    var cols=['#1D3A6B','#2E6B4A','#6B4A1D','#4A2E6B','#2B5C7A'];
+    for(var row=0;row<34;row++){ var px=26; while(px<990){ var w=14+Math.floor(r()*46); x.fillStyle=cols[Math.floor(r()*5)]; x.fillRect(px,26+row*17.5,w-2,14); px+=w; } }
+    return cv;
+  }
+  var gl=null; try{ gl=c.getContext('webgl',{antialias:true})||c.getContext('experimental-webgl'); }catch(e){}
+  var real=false, aspect=0.69;
+  if(!gl){ // no WebGL: flat picture of the real top view
+    var x2=c.getContext('2d'), im0=new Image(); im0.onload=function(){ c.width=c.clientWidth||600; c.height=Math.round(c.width*im0.naturalHeight/im0.naturalWidth); x2.drawImage(im0,0,0,c.width,c.height); }; im0.src=BASE+'top.webp';
+    note.textContent='WebGL is not available in this browser, so this is a flat view of the real layout.'; return;
+  }
+  var vsS='attribute vec3 p; attribute vec2 uv; uniform mat4 m; varying vec2 v; void main(){v=uv; gl_Position=m*vec4(p,1.0);}';
+  var fsS='precision mediump float; varying vec2 v; uniform sampler2D t; uniform vec4 col; uniform float useTex; void main(){ vec4 c=useTex>0.5?texture2D(t,v)*col:col; gl_FragColor=c; }';
+  function sh(type,src){ var s=gl.createShader(type); gl.shaderSource(s,src); gl.compileShader(s); return s; }
+  var prog=gl.createProgram(); gl.attachShader(prog,sh(gl.VERTEX_SHADER,vsS)); gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,fsS)); gl.linkProgram(prog); gl.useProgram(prog);
+  var aP=gl.getAttribLocation(prog,'p'), aUV=gl.getAttribLocation(prog,'uv'), uM=gl.getUniformLocation(prog,'m'), uCol=gl.getUniformLocation(prog,'col'), uTex=gl.getUniformLocation(prog,'useTex'), uT=gl.getUniformLocation(prog,'t');
+  var TH=0.07, hw=0.5;
+  function quad(a,b,c2,d){ return [].concat(a,b,c2,a,c2,d); }
+  function geom(){
+    var top=quad([-hw,TH/2,-hw,0,0],[hw,TH/2,-hw,1,0],[hw,TH/2,hw,1,1],[-hw,TH/2,hw,0,1]);
+    var y0=-TH/2,y1=TH/2;
+    var sides=[].concat(
+      quad([-hw,y0,hw,0,0],[hw,y0,hw,1,0],[hw,y1,hw,1,1],[-hw,y1,hw,0,1]),
+      quad([hw,y0,-hw,0,0],[-hw,y0,-hw,1,0],[-hw,y1,-hw,1,1],[hw,y1,-hw,0,1]),
+      quad([hw,y0,hw,0,0],[hw,y0,-hw,1,0],[hw,y1,-hw,1,1],[hw,y1,hw,0,1]),
+      quad([-hw,y0,-hw,0,0],[-hw,y0,hw,1,0],[-hw,y1,hw,1,1],[-hw,y1,-hw,0,1]));
+    return new Float32Array(top.concat(sides));
+  }
+  var buf=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,buf); gl.bufferData(gl.ARRAY_BUFFER,geom(),gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(aP); gl.vertexAttribPointer(aP,3,gl.FLOAT,false,20,0); gl.enableVertexAttribArray(aUV); gl.vertexAttribPointer(aUV,2,gl.FLOAT,false,20,12);
+  function mkTex(src){
+    var t=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,t);
+    gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,src);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+    return t;
+  }
+  var texTop=mkTex(fallbackLayout()), on={}, loaded=0, started=false;
+  LAYERS.forEach(function(L){ L.tex=null; on[L.k]=true; });
+  function setNote(t){ note.textContent=t||DEFAULT_NOTE; }
+  function loadAll(){
+    if(started) return; started=true;
+    var im=new Image(); im.onload=function(){ aspect=im.naturalHeight/im.naturalWidth; texTop=mkTex(im); real=true; setNote(); draw(); }; im.onerror=function(){ setNote('Layout images were not found at images/chip/. Showing an illustrative layout instead.'); }; im.src=BASE+'top.webp';
+    LAYERS.forEach(function(L){ var i2=new Image(); i2.onload=function(){ L.tex=mkTex(i2); loaded++; draw(); }; i2.src=BASE+L.k+'.webp'; });
+  }
+  setNote('Loading the layout…');
+  // legend: one toggle per real layer
+  LAYERS.forEach(function(L){
+    var b=doc.createElement('button'); b.type='button'; b.setAttribute('aria-pressed','true'); b.title=L.d;
+    b.innerHTML='<i style="background:'+L.col+'"></i>'+L.n;
+    b.addEventListener('click',function(){ on[L.k]=!on[L.k]; b.setAttribute('aria-pressed',on[L.k]?'true':'false'); if(!explodeT){ explodeT=1; expB.textContent='Collapse layers'; if(reduce) explode=1; } setNote(L.n+': '+L.d+'.'); draw(); });
+    b.addEventListener('mouseenter',function(){ setNote(L.n+': '+L.d+'.'); }); b.addEventListener('mouseleave',function(){ setNote(); });
+    legend.appendChild(b);
+  });
+  function mul(a,b){ var o=new Float32Array(16); for(var i=0;i<4;i++) for(var j=0;j<4;j++){ var s=0; for(var k=0;k<4;k++) s+=a[k*4+j]*b[i*4+k]; o[i*4+j]=s; } return o; }
+  function persp(fov,asp,n,f){ var t=1/Math.tan(fov/2); return new Float32Array([t/asp,0,0,0, 0,t,0,0, 0,0,(f+n)/(n-f),-1, 0,0,2*f*n/(n-f),0]); }
+  function rotX(a){ var c1=Math.cos(a),s=Math.sin(a); return new Float32Array([1,0,0,0, 0,c1,s,0, 0,-s,c1,0, 0,0,0,1]); }
+  function rotY(a){ var c1=Math.cos(a),s=Math.sin(a); return new Float32Array([c1,0,-s,0, 0,1,0,0, s,0,c1,0, 0,0,0,1]); }
+  function trans(x,y,z){ return new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, x,y,z,1]); }
+  function scl(x,y,z){ return new Float32Array([x,0,0,0, 0,y,0,0, 0,0,z,0, 0,0,0,1]); }
+  var yaw=0.6, pitch=0.8, dist=2.0, spin=!reduce, explode=0, explodeT=0, dragging=false, lx=0, ly=0, vis=false, dprv=1;
+  function size(){ dprv=Math.min(2,devicePixelRatio||1); var w=c.clientWidth||600, h=parseInt(c.getAttribute('height'),10)||420; c.width=w*dprv; c.height=h*dprv; c.style.height=h+'px'; gl.viewport(0,0,c.width,c.height); }
+  function draw(){
+    gl.clearColor(0.055,0.067,0.078,1); gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT); gl.enable(gl.DEPTH_TEST);
+    var P=persp(0.9,c.width/c.height,0.1,20), base=mul(P,mul(trans(0,-0.05,-dist),mul(rotX(pitch),rotY(yaw)))), S=scl(1.55,1,1.55*aspect);
+    gl.activeTexture(gl.TEXTURE0); gl.uniform1i(uT,0);
+    gl.uniformMatrix4fv(uM,false,mul(base,S));
+    gl.uniform1f(uTex,0); gl.uniform4f(uCol,0.16,0.18,0.21,1); gl.drawArrays(gl.TRIANGLES,6,24);   // silicon sides
+    // top face: the real composite layout, fading out as the stack is pulled apart
+    gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+    gl.bindTexture(gl.TEXTURE_2D,texTop); gl.uniform1f(uTex,1); gl.uniform4f(uCol,1,1,1,1-0.82*explode); gl.drawArrays(gl.TRIANGLES,0,6);
+    if(explode>0.01){
+      gl.depthMask(false);
+      LAYERS.forEach(function(L,i){
+        if(!L.tex||!on[L.k]) return;
+        var y=0.13*explode*(i+1);
+        gl.bindTexture(gl.TEXTURE_2D,L.tex); gl.uniformMatrix4fv(uM,false,mul(base,mul(trans(0,y,0),S)));
+        gl.uniform4f(uCol,1,1,1,explode); gl.drawArrays(gl.TRIANGLES,0,6);
+      });
+      gl.depthMask(true);
+    }
+    gl.disable(gl.BLEND);
+  }
+  function loop(){ if(!vis) return; if(spin&&!dragging) yaw+=0.006; explode+=(explodeT-explode)*0.12; draw(); requestAnimationFrame(loop); }
+  new IntersectionObserver(function(es){ var was=vis; vis=es[0].isIntersecting; if(vis){ loadAll(); } if(vis&&!was){ size(); requestAnimationFrame(loop); } },{rootMargin:'200px'}).observe(c);
+  addEventListener('resize',function(){size(); draw();});
+  c.addEventListener('pointerdown',function(e){ dragging=true; lx=e.clientX; ly=e.clientY; c.setPointerCapture(e.pointerId); });
+  c.addEventListener('pointermove',function(e){ if(!dragging) return; yaw+=(e.clientX-lx)*0.01; pitch=clamp(pitch+(e.clientY-ly)*0.01,0.05,1.5); lx=e.clientX; ly=e.clientY; if(!vis) draw(); });
+  c.addEventListener('pointerup',function(){dragging=false;}); c.addEventListener('pointercancel',function(){dragging=false;});
+  spinB.textContent='Auto-spin: '+(spin?'on':'off');
+  spinB.addEventListener('click',function(){ spin=!spin; spinB.textContent='Auto-spin: '+(spin?'on':'off'); });
+  expB.addEventListener('click',function(){ explodeT=explodeT?0:1; expB.textContent=explodeT?'Collapse layers':'Explode layers'; if(reduce){explode=explodeT; draw();} });
+  topB.addEventListener('click',function(){ pitch=1.5; yaw=0; draw(); });
+  size(); draw();
+})();
+
+/* ===================== 3. SKILL GRAPH ===================== */
+(function(){
+  var c=$('graph'), app=window.SVApp; if(!c||!app) return;
+  var nodes=[], edges=[], idx={};
+  function node(id,label,kind){ if(idx[id]!==undefined) return idx[id]; idx[id]=nodes.length; nodes.push({id:id,label:label,kind:kind,x:0,y:0,vx:0,vy:0,deg:0}); return idx[id]; }
+  app.skillTargets.forEach(function(t){
+    var title=(t.querySelector('.title')||t.querySelector('h3')||{}).textContent||t.id||'Internship';
+    title=title.replace(/\s+/g,' ').trim();
+    var short=/Metamaterial/.test(title)?'THz sensor':/Tiny|Anomaly/.test(title)?'TinyTapeout':/LoRa/.test(title)?'LoRa chat':/ANGEL/.test(title)?'ANGEL BOT':/Dual-Band|FSS/.test(title)?'FSS final-year':/TDMA/.test(title)?'TDMA planner':/NGAP|BaSig|NAS/.test(title)?'BaSig 5G':title.slice(0,14);
+    var a=node('P:'+short,short,'proj');
+    t.dataset.skills.split('|').forEach(function(s){ var b=node('S:'+s,s,'skill'); edges.push([a,b]); nodes[a].deg++; nodes[b].deg++; });
+  });
+  var W=600,H=380, drag=null, hover=-1, sel=null, alpha=1;
+  nodes.forEach(function(n,i){ var a=i/nodes.length*6.283; n.x=300+Math.cos(a)*140+Math.random()*10; n.y=190+Math.sin(a)*110; });
+  function step(){
+    var i,j,n,m,dx,dy,d2,d,f;
+    for(i=0;i<nodes.length;i++){ n=nodes[i];
+      for(j=i+1;j<nodes.length;j++){ m=nodes[j]; dx=n.x-m.x; dy=n.y-m.y; d2=dx*dx+dy*dy+30; f=(n.kind==='proj'&&m.kind==='proj'?2600:900)/d2; d=Math.sqrt(d2);
+        n.vx+=dx/d*f; n.vy+=dy/d*f; m.vx-=dx/d*f; m.vy-=dy/d*f; }
+      n.vx+=(W/2-n.x)*0.0016; n.vy+=(H/2-n.y)*0.0022; }
+    edges.forEach(function(e){ var a=nodes[e[0]], b=nodes[e[1]]; dx=b.x-a.x; dy=b.y-a.y; d=Math.sqrt(dx*dx+dy*dy)||1; f=(d-85)*0.012;
+      a.vx+=dx/d*f; a.vy+=dy/d*f; b.vx-=dx/d*f; b.vy-=dy/d*f; });
+    nodes.forEach(function(n){ if(n===drag) return; n.vx*=0.82; n.vy*=0.82; n.x=clamp(n.x+n.vx*alpha,30,W-30); n.y=clamp(n.y+n.vy*alpha,18,H-18); });
+    alpha=Math.max(0.15,alpha*0.995);
+  }
+  function neigh(i){ var s={}; s[i]=1; edges.forEach(function(e){ if(e[0]===i) s[e[1]]=1; if(e[1]===i) s[e[0]]=1; }); return s; }
+  var g=setup(c,function(x,w,h){
+    W=w; H=h;
+    x.fillStyle='#0E1114'; x.fillRect(0,0,W,H);
+    var act=hover>=0?hover:(sel!==null?idx['S:'+sel]:-1), nb=act>=0?neigh(act):null;
+    edges.forEach(function(e){ var a=nodes[e[0]], b=nodes[e[1]], lit=!nb||(nb[e[0]]&&nb[e[1]]&&(e[0]===act||e[1]===act));
+      x.strokeStyle=lit?'rgba(224,164,92,.75)':'rgba(150,160,150,.12)'; x.lineWidth=lit&&nb?1.6:1; x.beginPath(); x.moveTo(a.x,a.y); x.lineTo(b.x,b.y); x.stroke(); });
+    x.font='11px IBM Plex Mono, monospace'; x.textBaseline='middle';
+    nodes.forEach(function(n,i){
+      var lit=!nb||nb[i], proj=n.kind==='proj', r=proj?9+n.deg*0.6:4+Math.min(4,n.deg);
+      x.globalAlpha=lit?1:.28;
+      x.fillStyle=proj?'#E0A45C':(sel&&n.id==='S:'+sel?'#fff':'#6E9BE0');
+      x.beginPath(); x.arc(n.x,n.y,r,0,6.283); x.fill();
+      x.fillStyle=proj?'#0E1114':'#D8DDD8';
+      if(proj){ x.font='600 11px IBM Plex Mono, monospace'; x.textAlign='center'; x.fillStyle='#E8E8E8'; x.fillText(n.label,n.x,n.y-r-9); }
+      else { x.font='11px IBM Plex Mono, monospace'; x.textAlign='left'; x.fillText(n.label,n.x+r+4,n.y); }
+      x.globalAlpha=1;
+    });
+  },function(){ if(reduce) return; step(); });
+  if(reduce){ for(var k=0;k<400;k++) step(); g.redraw(); }
+  function at(e){ var r=c.getBoundingClientRect(), p=e.touches?e.touches[0]:e, x=(p.clientX-r.left)*(W/r.width), y=(p.clientY-r.top)*(H/r.height), best=-1, bd=18*18;
+    nodes.forEach(function(n,i){ var d=(n.x-x)*(n.x-x)+(n.y-y)*(n.y-y); if(d<bd){bd=d;best=i;} }); return {i:best,x:x,y:y}; }
+  c.addEventListener('pointerdown',function(e){ var h=at(e); if(h.i>=0){ drag=nodes[h.i]; drag.moved=0; c.setPointerCapture(e.pointerId); alpha=1; } });
+  c.addEventListener('pointermove',function(e){ var h=at(e); if(drag){ drag.x=clamp(h.x,20,W-20); drag.y=clamp(h.y,16,H-16); drag.vx=drag.vy=0; drag.moved++; alpha=1; if(reduce) g.redraw(); } else { hover=h.i; c.style.cursor=h.i>=0?'pointer':'default'; if(reduce) g.redraw(); } });
+  c.addEventListener('pointerup',function(){ if(drag){ var n=drag; drag=null; if(n.moved<4&&n.kind==='skill'){ var s=n.id.slice(2); sel=(sel===s)?null:s; app.setSkill(s); } } });
+  c.addEventListener('pointerleave',function(){hover=-1;});
+})();
+
+/* ===================== 4. GIT ACTIVITY WINDOW ===================== */
+(function(){
+  var box=$('ghFeed'); if(!box) return;
+  var U='Sudarshan-veera';
+  function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function ago(d){ var s=(Date.now()-new Date(d))/1000; if(s<3600) return Math.max(1,Math.round(s/60))+'m ago'; if(s<86400) return Math.round(s/3600)+'h ago'; return Math.round(s/86400)+'d ago'; }
+  function line(html){ var d=doc.createElement('div'); d.innerHTML=html; box.appendChild(d); box.scrollTop=box.scrollHeight; }
+  function typeLines(lines){
+    box.innerHTML='<div class="g-dim">$ git log --all --oneline</div>';
+    if(reduce){ lines.forEach(line); return; }
+    var i=0; (function next(){ if(i<lines.length){ line(lines[i++]); setTimeout(next,140); } })();
+  }
+  function fromEvents(ev){
+    var out=[];
+    ev.forEach(function(e){
+      if(e.type==='PushEvent'&&e.payload&&e.payload.commits){
+        e.payload.commits.slice(0,2).forEach(function(c){ out.push({t:e.created_at,html:'<span class="g-hash">'+esc(c.sha.slice(0,7))+'</span> '+esc((c.message||'').split('\n')[0].slice(0,70))+' <span class="g-dim">('+esc(e.repo.name.split('/')[1])+', '+ago(e.created_at)+')</span>'}); });
+      } else if(e.type==='CreateEvent'&&e.payload.ref_type==='repository'){
+        out.push({t:e.created_at,html:'<span class="g-ok">+ created</span> <span class="g-repo">'+esc(e.repo.name.split('/')[1])+'</span> <span class="g-dim">('+ago(e.created_at)+')</span>'});
+      }
+    });
+    return out.slice(0,14).map(function(o){return o.html;});
+  }
+  function fromRepos(rs){
+    return rs.filter(function(r){return !r.fork;}).slice(0,8).map(function(r){
+      return '<span class="g-ok">●</span> <a class="g-repo" href="'+esc(r.html_url)+'" target="_blank" rel="noopener">'+esc(r.name)+'</a> <span class="g-dim">'+esc(r.language||'')+' · pushed '+ago(r.pushed_at)+'</span>';
+    });
+  }
+  function fallback(why){
+    $('ghStamp').textContent='offline';
+    box.innerHTML='<div class="g-dim">$ git log --all --oneline</div><div>fatal: could not reach api.github.com ('+esc(why)+')</div><div class="g-dim">The live log needs the public GitHub API; it can be blocked by a browser, network or rate limit.</div><div><a class="g-repo" href="https://github.com/'+U+'" target="_blank" rel="noopener">→ open github.com/'+U+'</a></div>';
+  }
+  var cached=null; try{cached=JSON.parse(sessionStorage.getItem('sv-gh2')||'null');}catch(e){}
+  if(cached&&Date.now()-cached.t<600000&&cached.l.length){ $('ghStamp').textContent='live · cached'; typeLines(cached.l); return; }
+  var get=function(u){ return fetch(u,{headers:{'Accept':'application/vnd.github+json'}}).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }); };
+  Promise.all([
+    get('https://api.github.com/users/'+U+'/events/public?per_page=30').then(fromEvents).catch(function(){return [];}),
+    get('https://api.github.com/users/'+U+'/repos?sort=pushed&per_page=8').then(fromRepos).catch(function(e){ fromRepos.err=e.message; return []; })
+  ]).then(function(r){
+    var lines=r[0].length?r[0]:r[1];
+    if(!lines.length){ fallback(fromRepos.err||'no public activity'); return; }
+    $('ghStamp').textContent='live · '+(r[0].length?'commits':'repos');
+    try{sessionStorage.setItem('sv-gh2',JSON.stringify({t:Date.now(),l:lines}));}catch(e){}
+    typeLines(lines);
+  }).catch(function(e){ fallback(e.message); });
+})();
+
+/* ===================== 4b. HEADER NAME: only after the big hero name scrolls away ===================== */
+(function(){
+  var h=doc.querySelector('h1.name'); if(!h||!('IntersectionObserver' in window)) return;
+  root.classList.add('brand-io');
+  new IntersectionObserver(function(es){ root.classList.toggle('name-out',!es[0].isIntersecting); },{rootMargin:'-56px 0px 0px 0px'}).observe(h);
+})();
+
+/* ===================== 5. SPOTLIGHT ===================== */
+(function(){
+  if(reduce||matchMedia('(hover:none)').matches) return;
+  var s=doc.createElement('div'); s.className='sv-spot'; doc.body.appendChild(s);
+  addEventListener('mousemove',function(e){ s.style.setProperty('--mx',e.clientX+'px'); s.style.setProperty('--my',e.clientY+'px'); s.classList.add('on'); },{passive:true});
+  doc.addEventListener('mouseleave',function(){s.classList.remove('on');});
+})();
 })();
 </script>
 
